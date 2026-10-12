@@ -54,7 +54,7 @@ func _monta_habilidades() -> Control:
 	var topo := HBoxContainer.new()
 	topo.add_theme_constant_override("separation", 8)
 	var t := Label.new()
-	t.text = "Ordem de uso (esquerda → direita):"
+	t.text = "Ordem de uso (esquerda → direita), a cada recarga:"
 	topo.add_child(t)
 	for s in Cfg.SLOTS_HABILIDADE:
 		var ob := OptionButton.new()
@@ -86,9 +86,12 @@ func _monta_talentos() -> Control:
 	_reset.pressed.connect(func(): estado.personagem.reseta_talentos())
 	topo.add_child(_reset)
 	v.add_child(topo)
+	var rolagem := ScrollContainer.new()
+	rolagem.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(rolagem)
 	var ramos := HBoxContainer.new()
-	ramos.add_theme_constant_override("separation", 30)
-	v.add_child(ramos)
+	ramos.add_theme_constant_override("separation", 24)
+	rolagem.add_child(ramos)
 	var colunas := {}
 	for t in Cfg.TALENTOS:
 		if not colunas.has(t["ramo"]):
@@ -104,7 +107,8 @@ func _monta_talentos() -> Control:
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 8)
 		var rot := Label.new()
-		rot.custom_minimum_size = Vector2(300, 0)
+		rot.custom_minimum_size = Vector2(220, 0)
+		rot.add_theme_font_size_override("font_size", 13)
 		h.add_child(rot)
 		var bt := Button.new()
 		bt.text = "+"
@@ -116,8 +120,8 @@ func _monta_talentos() -> Control:
 	return v
 
 func _atualiza() -> void:
-	_status.text = "Nível %d   |   Vida %d   Ataque %d   Defesa %d   Crítico %d%% (x%.2f)   Vel. %.2f/s   Regen %.1f%%/s   |   CP %d" % [
-		estado.nivel, roundi(estado.personagem.vida_max()), roundi(estado.personagem.ataque()), roundi(estado.personagem.defesa()),
+	_status.text = "Estilo: %s   |   Nível %d   |   Vida %d   Ataque %d   Defesa %d   Crítico %d%% (x%.2f)   Vel. %.2f/s   Regen %.1f%%/s   |   CP %d" % [
+		estado.personagem.nome_estilo(), estado.nivel, roundi(estado.personagem.vida_max()), roundi(estado.personagem.ataque()), roundi(estado.personagem.defesa()),
 		roundi(estado.personagem.crit_chance() * 100.0), estado.personagem.crit_mult(), 1.0 / estado.personagem.intervalo(), estado.personagem.regen_pct() * 100.0, estado.personagem.cp()]
 	for i in Cfg.ATRIBUTOS.size():
 		var a: Dictionary = Cfg.ATRIBUTOS[i]
@@ -164,16 +168,16 @@ func _atualiza_resto() -> void:
 		var h: Dictionary = Cfg.HABILIDADES[i]
 		var l: Dictionary = _hab_rot[i]
 		if estado.personagem.habilidade_liberada(i):
-			l["rotulo"].text = "%s  Nv %d  (%s, recarga %d s)" % [h["nome"], estado.personagem.hab_niveis[h["id"]], h["desc"], roundi(h["cd"])]
+			l["rotulo"].text = "[%s] %s  Nv %d  (%s, recarga %d s)" % [Cfg.ESTILOS[h["estilo"]]["nome"], h["nome"], estado.personagem.hab_niveis[h["id"]], h["desc"], roundi(h["cd"] * estado.personagem.recarga_mult())]
 			var c: int = estado.personagem.custo_habilidade(i)
 			l["botao"].text = "Melhorar: %d" % c
 			l["botao"].disabled = estado.ouro < c
 		else:
-			l["rotulo"].text = "%s  (libera no nível %d)" % [h["nome"], h["nivel"]]
+			l["rotulo"].text = "[%s] %s  (libere na aba Talentos)" % [Cfg.ESTILOS[h["estilo"]]["nome"], h["nome"]]
 			l["botao"].text = "Bloqueada"
 			l["botao"].disabled = true
 	# talentos
-	_pontos.text = "Pontos de talento: %d  (1 por nível)" % estado.personagem.pontos_talento()
+	_pontos.text = "Pontos de talento: %d  (1 por nível). Os nós com o nome de uma habilidade a liberam." % estado.personagem.pontos_talento()
 	_reset.text = "Resetar talentos (%d ouro)" % estado.personagem.custo_reset_talentos()
 	_reset.disabled = estado.personagem.pontos_talento_gastos() == 0 or estado.ouro < estado.personagem.custo_reset_talentos()
 	for i in Cfg.TALENTOS.size():
@@ -182,7 +186,9 @@ func _atualiza_resto() -> void:
 		var req := ""
 		if t["req"] != "" and estado.personagem.talentos[t["req"]] == 0:
 			req = "  [requer %s]" % _nome_talento(t["req"])
-		l["rotulo"].text = "%s %d/%d  (%s)%s" % [t["nome"], estado.personagem.talentos[t["id"]], t["max"], t["desc"], req]
+		l["rotulo"].text = "%s %d/%d  %s%s" % [t["nome"], estado.personagem.talentos[t["id"]], t["max"], t["desc"], req]
+		if t["efeito"] == "skill":
+			l["rotulo"].add_theme_color_override("font_color", Cfg.ESTILOS[estado.personagem.habilidade_por_id(t["skill"])["estilo"]]["cor"])
 		l["botao"].disabled = not estado.personagem.pode_talento(i)
 
 func _nome_talento(id: String) -> String:

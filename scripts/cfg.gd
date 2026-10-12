@@ -29,16 +29,44 @@ const ATRIBUTOS := [
 	{"id": "vel_ataque", "nome": "Vel. de ataque", "bonus": 0.04, "custo_base": 30.0, "crescimento": 1.55, "max": 25, "desc": "+4% vel. de ataque"},
 ]
 
-# ================= TALENTOS (1 ponto por nivel do heroi) =================
-# efeito: dano_pct, vida_pct, regen, defesa_pct, crit, crit_mult, ouro_pct, xp_pct, colheita_pct, crescimento_pct
+# ================= ESTILOS, TALENTOS E HABILIDADES =================
+# O estilo do heroi (fisico/magico/distancia) vem das habilidades equipadas, nao de uma classe.
+# Arma do mesmo estilo da habilidade dá AFINIDADE_CERTA no dano dela; outra arma (ou sem arma) dá AFINIDADE_ERRADA.
+const ESTILOS := {
+	"fisico": {"nome": "Físico", "cor": Color(1.0, 0.6, 0.3)},
+	"magico": {"nome": "Mágico", "cor": Color(0.55, 0.65, 1.0)},
+	"distancia": {"nome": "Distância", "cor": Color(0.5, 0.95, 0.5)},
+}
+const AFINIDADE_CERTA := 1.25
+const AFINIDADE_ERRADA := 0.70
+
+# ---------- Talentos (1 ponto por nivel do heroi) ----------
+# efeito: dano_pct, vida_pct, regen, defesa_pct, crit, crit_mult, vel_pct, skill_pct (dano das habilidades),
+#   recarga_pct (reduz a recarga), ouro_pct, xp_pct, colheita_pct, crescimento_pct, ou "skill" (libera a habilidade "skill")
 # req = id do talento que precisa ter ao menos 1 ponto
 const TALENTOS := [
-	{"id": "golpe_forte", "ramo": "Combate", "nome": "Golpe Forte", "efeito": "dano_pct", "valor": 0.05, "max": 5, "req": "", "desc": "+5% ataque"},
-	{"id": "olho_afiado", "ramo": "Combate", "nome": "Olho Afiado", "efeito": "crit", "valor": 0.02, "max": 5, "req": "golpe_forte", "desc": "+2% crítico"},
-	{"id": "furia_t", "ramo": "Combate", "nome": "Ferocidade", "efeito": "crit_mult", "valor": 0.10, "max": 3, "req": "olho_afiado", "desc": "+10% dano crítico"},
-	{"id": "pele_grossa", "ramo": "Defesa", "nome": "Pele Grossa", "efeito": "vida_pct", "valor": 0.05, "max": 5, "req": "", "desc": "+5% vida"},
-	{"id": "vigor", "ramo": "Defesa", "nome": "Vigor", "efeito": "regen", "valor": 0.003, "max": 5, "req": "pele_grossa", "desc": "+0,3% vida/s"},
-	{"id": "muralha", "ramo": "Defesa", "nome": "Muralha", "efeito": "defesa_pct", "valor": 0.08, "max": 3, "req": "vigor", "desc": "+8% defesa"},
+	# --- Lamina (fisico) ---
+	{"id": "golpe_forte", "ramo": "Lâmina", "nome": "Golpe Forte", "efeito": "dano_pct", "valor": 0.05, "max": 5, "req": "", "desc": "+5% ataque"},
+	{"id": "t_giratorio", "ramo": "Lâmina", "nome": "Golpe Giratório", "efeito": "skill", "skill": "giratorio", "valor": 0.0, "max": 1, "req": "golpe_forte", "desc": "libera a habilidade"},
+	{"id": "pele_grossa", "ramo": "Lâmina", "nome": "Pele Grossa", "efeito": "vida_pct", "valor": 0.05, "max": 5, "req": "golpe_forte", "desc": "+5% vida"},
+	{"id": "t_postura", "ramo": "Lâmina", "nome": "Postura de Ferro", "efeito": "skill", "skill": "postura", "valor": 0.0, "max": 1, "req": "pele_grossa", "desc": "libera a habilidade"},
+	{"id": "muralha", "ramo": "Lâmina", "nome": "Muralha", "efeito": "defesa_pct", "valor": 0.08, "max": 3, "req": "t_postura", "desc": "+8% defesa"},
+	{"id": "t_enxadada", "ramo": "Lâmina", "nome": "Enxadada Lendária", "efeito": "skill", "skill": "enxadada", "valor": 0.0, "max": 1, "req": "t_giratorio", "desc": "libera a habilidade"},
+	# --- Arcano (magico) ---
+	{"id": "mente_clara", "ramo": "Arcano", "nome": "Mente Clara", "efeito": "skill_pct", "valor": 0.05, "max": 5, "req": "", "desc": "+5% dano de habilidades"},
+	{"id": "t_fogo", "ramo": "Arcano", "nome": "Bola de Fogo", "efeito": "skill", "skill": "fogo", "valor": 0.0, "max": 1, "req": "mente_clara", "desc": "libera a habilidade"},
+	{"id": "foco", "ramo": "Arcano", "nome": "Foco", "efeito": "recarga_pct", "valor": 0.04, "max": 4, "req": "mente_clara", "desc": "-4% recarga"},
+	{"id": "t_raio", "ramo": "Arcano", "nome": "Raio Arcano", "efeito": "skill", "skill": "raio", "valor": 0.0, "max": 1, "req": "t_fogo", "desc": "libera a habilidade"},
+	{"id": "t_cura", "ramo": "Arcano", "nome": "Cura Verde", "efeito": "skill", "skill": "cura", "valor": 0.0, "max": 1, "req": "foco", "desc": "libera a habilidade"},
+	{"id": "vigor", "ramo": "Arcano", "nome": "Vigor", "efeito": "regen", "valor": 0.003, "max": 5, "req": "t_cura", "desc": "+0,3% vida/s"},
+	# --- Arco (distancia) ---
+	{"id": "olho_afiado", "ramo": "Arco", "nome": "Olho Afiado", "efeito": "crit", "valor": 0.02, "max": 5, "req": "", "desc": "+2% crítico"},
+	{"id": "t_tiro", "ramo": "Arco", "nome": "Tiro Preciso", "efeito": "skill", "skill": "tiro", "valor": 0.0, "max": 1, "req": "olho_afiado", "desc": "libera a habilidade"},
+	{"id": "ligeireza", "ramo": "Arco", "nome": "Ligeireza", "efeito": "vel_pct", "valor": 0.04, "max": 5, "req": "olho_afiado", "desc": "+4% vel. de ataque"},
+	{"id": "t_chuva", "ramo": "Arco", "nome": "Chuva de Flechas", "efeito": "skill", "skill": "chuva", "valor": 0.0, "max": 1, "req": "t_tiro", "desc": "libera a habilidade"},
+	{"id": "t_olho", "ramo": "Arco", "nome": "Olho de Águia", "efeito": "skill", "skill": "olho", "valor": 0.0, "max": 1, "req": "ligeireza", "desc": "libera a habilidade"},
+	{"id": "ferocidade", "ramo": "Arco", "nome": "Ferocidade", "efeito": "crit_mult", "valor": 0.10, "max": 3, "req": "t_chuva", "desc": "+10% dano crítico"},
+	# --- Cultivo (a fazenda lê estes bônus) ---
 	{"id": "maos_ouro", "ramo": "Cultivo", "nome": "Mãos de Ouro", "efeito": "ouro_pct", "valor": 0.05, "max": 5, "req": "", "desc": "+5% ouro"},
 	{"id": "estudioso", "ramo": "Cultivo", "nome": "Estudioso", "efeito": "xp_pct", "valor": 0.05, "max": 5, "req": "maos_ouro", "desc": "+5% XP"},
 	{"id": "colheita_farta", "ramo": "Cultivo", "nome": "Colheita Farta", "efeito": "colheita_pct", "valor": 0.25, "max": 4, "req": "", "desc": "+25% colheita"},
@@ -46,21 +74,27 @@ const TALENTOS := [
 ]
 const RESET_TALENTOS_CUSTO := 100.0   # ouro por nivel do heroi
 
-# ================= HABILIDADES AUTOMATICAS =================
-# Usadas da esquerda para a direita: a cada GCD usa a primeira pronta da fila.
-# tipo: dano (mult do ataque, golpes), cura (% vida), buff_dano (% por duracao), escudo (reducao de dano por duracao)
+# ---------- Habilidades automaticas ----------
+# Usadas da esquerda para a direita: a cada GCD usa a primeira pronta da fila. Sao liberadas pela arvore de
+# talentos (exceto a "inicial"). tipo: dano (mult do ataque x golpes), cura (% vida),
+# buff_crit (+chance critica por duracao), escudo (reducao de dano por duracao).
+# efeito = animacao feita por codigo (ver skills.gd): corte, giro, projetil, raio, chuva, enxada, cura, escudo, mira
 const SLOTS_HABILIDADE := 4
 const GCD_HABILIDADE := 1.0
-const HABILIDADE_BONUS_POR_NIVEL := 0.10   # +10% do efeito por nivel da habilidade
+const HABILIDADE_BONUS_POR_NIVEL := 0.10   # +10% do efeito por nivel da habilidade (comprado com ouro)
 const HABILIDADE_CUSTO_BASE := 30.0
 const HABILIDADE_CUSTO_CRESC := 1.6
 const HABILIDADES := [
-	{"id": "golpe", "nome": "Golpe Poderoso", "nivel": 1, "tipo": "dano", "mult": 2.5, "golpes": 1, "cd": 6.0, "desc": "250% do ataque"},
-	{"id": "rajada", "nome": "Rajada", "nivel": 3, "tipo": "dano", "mult": 0.9, "golpes": 3, "cd": 10.0, "desc": "3 golpes de 90%"},
-	{"id": "cura", "nome": "Cura Vital", "nivel": 6, "tipo": "cura", "valor": 0.25, "cd": 20.0, "desc": "cura 25% da vida"},
-	{"id": "furia", "nome": "Fúria Selvagem", "nivel": 9, "tipo": "buff_dano", "valor": 0.5, "duracao": 8.0, "cd": 25.0, "desc": "+50% ataque por 8s"},
-	{"id": "escudo", "nome": "Escudo de Luz", "nivel": 12, "tipo": "escudo", "valor": 0.5, "duracao": 6.0, "cd": 25.0, "desc": "-50% dano por 6s"},
-	{"id": "tempestade", "nome": "Tempestade", "nivel": 15, "tipo": "dano", "mult": 5.0, "golpes": 1, "cd": 18.0, "desc": "500% do ataque"},
+	{"id": "golpe", "nome": "Corte Rápido", "estilo": "fisico", "inicial": true, "tipo": "dano", "mult": 1.8, "golpes": 1, "cd": 4.0, "efeito": "corte", "desc": "180% do ataque"},
+	{"id": "giratorio", "nome": "Golpe Giratório", "estilo": "fisico", "tipo": "dano", "mult": 3.0, "golpes": 1, "cd": 8.0, "efeito": "giro", "desc": "300% do ataque"},
+	{"id": "postura", "nome": "Postura de Ferro", "estilo": "fisico", "tipo": "escudo", "valor": 0.4, "duracao": 8.0, "cd": 14.0, "efeito": "escudo", "desc": "-40% dano por 8s"},
+	{"id": "enxadada", "nome": "Enxadada Lendária", "estilo": "fisico", "tipo": "dano", "mult": 5.0, "golpes": 1, "cd": 12.0, "efeito": "enxada", "desc": "500% do ataque (a enxada do destino)"},
+	{"id": "fogo", "nome": "Bola de Fogo", "estilo": "magico", "tipo": "dano", "mult": 2.0, "golpes": 1, "cd": 5.0, "efeito": "projetil", "cor": Color(1.0, 0.5, 0.15), "desc": "200% do ataque"},
+	{"id": "raio", "nome": "Raio Arcano", "estilo": "magico", "tipo": "dano", "mult": 3.5, "golpes": 1, "cd": 9.0, "efeito": "raio", "cor": Color(0.6, 0.8, 1.0), "desc": "350% do ataque"},
+	{"id": "cura", "nome": "Cura Verde", "estilo": "magico", "tipo": "cura", "valor": 0.25, "cd": 15.0, "efeito": "cura", "desc": "cura 25% da vida"},
+	{"id": "tiro", "nome": "Tiro Preciso", "estilo": "distancia", "tipo": "dano", "mult": 1.7, "golpes": 1, "cd": 4.0, "efeito": "projetil", "cor": Color(0.85, 0.95, 0.5), "desc": "170% do ataque"},
+	{"id": "chuva", "nome": "Chuva de Flechas", "estilo": "distancia", "tipo": "dano", "mult": 1.1, "golpes": 3, "cd": 8.0, "efeito": "chuva", "cor": Color(0.85, 0.95, 0.5), "desc": "3 golpes de 110%"},
+	{"id": "olho", "nome": "Olho de Águia", "estilo": "distancia", "tipo": "buff_crit", "valor": 0.3, "duracao": 8.0, "cd": 14.0, "efeito": "mira", "desc": "+30% crítico por 8s"},
 ]
 
 # ================= FASES / INIMIGOS =================
@@ -91,8 +125,15 @@ const CHEFES := {
 
 # ================= EQUIPAMENTO =================
 const SLOTS := ["Arma", "Armadura", "Acessório"]
-const NOMES_ITEM := ["Espada", "Armadura", "Amuleto"]
+const NOMES_ITEM := ["Espada", "Armadura", "Amuleto"]            # o nome da arma vem de TIPOS_ARMA
 const NOMES_ITEM_ZONA2 := ["Espada de Aço", "Armadura de Aço", "Amuleto de Prata"]
+# A arma sorteia um tipo; o estilo dele combina com as habilidades do mesmo estilo (AFINIDADE_*)
+const TIPOS_ARMA := [
+	{"nome": "Espada", "nome_zona2": "Espada de Aço", "estilo": "fisico", "curto": "Esp"},
+	{"nome": "Cajado", "nome_zona2": "Cajado de Carvalho", "estilo": "magico", "curto": "Caj"},
+	{"nome": "Arco", "nome_zona2": "Arco Longo", "estilo": "distancia", "curto": "Arc"},
+]
+const MOCHILA_TAMANHO := 24          # drops ficam na mochila; cheia = o item de menor valor e vendido
 const RARIDADES := [
 	{"nome": "Comum", "cor": Color(0.8, 0.8, 0.8), "mult": 1.0, "peso": 60.0},
 	{"nome": "Raro", "cor": Color(0.35, 0.6, 1.0), "mult": 1.6, "peso": 28.0},

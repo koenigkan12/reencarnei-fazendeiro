@@ -9,8 +9,9 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 |---|---|
 | `scripts/cfg.gd` | Todas as constantes e tabelas (atributos, talentos, habilidades, inimigos, itens, culturas...). |
 | `scripts/estado.gd` | Raiz: ouro, nivel, XP, minerio, sinal `mudou`, `tick(delta)` e as referencias `personagem`, `equipamento`, `fazenda`, `loja`, `comida`. |
-| `scripts/personagem.gd` | Atributos, talentos, habilidades automaticas e todos os stats derivados (vida, ataque, defesa, critico, CP). |
-| `scripts/equipamento.gd` | 3 espacos, drops com raridade, auto-equipar/vender, melhoria +N (ouro + minerio). |
+| `scripts/personagem.gd` | Atributos, talentos (liberam habilidades), habilidades equipadas, estilo, afinidade arma/habilidade e todos os stats derivados (vida, ataque, defesa, critico, CP). |
+| `scripts/skills.gd` | Habilidades automaticas na luta: recarga, ordem esquerda->direita, dano, buffs e efeitos visuais por codigo. |
+| `scripts/equipamento.gd` | 3 espacos, tipos de arma, mochila (24), drops com raridade, equipar/vender, auto-equipar opcional, melhoria +N (ouro + minerio). |
 | `scripts/fazenda.gd` | Terreno, ferramentas, sementes, crescimento (regado), colheita, rochas, Cultivo. |
 | `scripts/loja.gd` | Compras: sementes, ferramentas, irrigacao. |
 | `scripts/comida.gd` | Pratos, estoque, 3 slots do heroi, buffs. |
@@ -22,7 +23,7 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 | `scripts/unidade.gd` | Combatente (retangulo colorido + barra de vida), placeholder da arte. |
 | `scripts/main.gd` | Raiz da UI: tela de cima (batalha/fazenda), painel de abas, teste headless (`-- --teste-batalha`). |
 | `scripts/aba_personagem.gd` | Aba Personagem (atributos, habilidades, talentos). |
-| `scripts/aba_equipamento.gd` | Aba Equipamento. |
+| `scripts/aba_equipamento.gd` | Aba Equipamento (3 espacos, +N, mochila com Equipar/Vender). |
 | `scripts/aba_fazenda.gd` | Aba Fazenda (semente do plantio, vender, cozinha, slots de comida). |
 | `scripts/aba_loja.gd` | Aba Loja. |
 | `scripts/fazenda_tela.gd` | Tela de cima da fazenda: barra de ferramentas + mapa. |

@@ -4,6 +4,7 @@ extends Control
 
 const Cfg := preload("res://scripts/cfg.gd")
 const Unidade := preload("res://scripts/unidade.gd")
+const Skills := preload("res://scripts/skills.gd")
 
 signal pede_aba(nome: String)
 
@@ -31,10 +32,7 @@ var _aviso: Label
 var _msg_drop: Label
 var _hud_comida: Label
 var _caixas_hab: Array = []   # [{painel, rotulo}]
-var cd_hab := {}                # id -> segundos restantes
-var gcd := 0.0
-var furia_restante := 0.0
-var escudo_restante := 0.0
+var skills                      # habilidades automaticas (skills.gd)
 var _painel_derrota: PanelContainer
 var _texto_derrota: Label
 
@@ -54,6 +52,7 @@ func _ready() -> void:
 	inimigo = Unidade.new()
 	add_child(inimigo)
 	_novo_inimigo()
+	skills = Skills.new(self, estado)
 
 	_cria_hud()
 	_cria_derrota()
@@ -209,7 +208,7 @@ func _process(delta: float) -> void:
 	if vitoria_final:
 		return
 	heroi.cura(heroi.vida_max * estado.personagem.regen_pct() * delta)
-	_tick_habilidades(delta)
+	skills.tick(delta)
 	if contra_chefe:
 		tempo_chefe -= delta
 		_barra_chefe.max_value = Cfg.CHEFES[chefe_tipo]["tempo"]
@@ -239,87 +238,19 @@ func _process(delta: float) -> void:
 func _ataca(atacante: Control, alvo: Control, direcao: float) -> void:
 	atacante.animacao_ataque(direcao)
 	if atacante == heroi:
-		var dano: float = atacante.dano * (1.0 + _furia_valor())
-		var crit: bool = randf() < estado.personagem.crit_chance()
+		var dano: float = atacante.dano
+		var crit: bool = randf() < skills.crit_chance()
 		if crit:
 			dano *= estado.personagem.crit_mult()
 		alvo.recebe_dano(dano)
 		_numero_de_dano(alvo, dano, false, crit)
 	else:
 		var dano2: float = atacante.dano * estado.personagem.reducao_dano()
-		if escudo_restante > 0.0:
-			dano2 *= 1.0 - _escudo_valor()
+		dano2 *= skills.escudo_mult()
 		alvo.recebe_dano(dano2)
 		_numero_de_dano(alvo, dano2, true, false)
 
-func _furia_valor() -> float:
-	return Cfg.HABILIDADES[3]["valor"] * estado.personagem.fator_habilidade("furia") if furia_restante > 0.0 else 0.0
 
-func _escudo_valor() -> float:
-	return minf(Cfg.HABILIDADES[4]["valor"] * estado.personagem.fator_habilidade("escudo"), 0.9)
-
-# Habilidades automaticas: a cada GCD usa a primeira pronta da esquerda para a direita
-func _tick_habilidades(delta: float) -> void:
-	furia_restante = maxf(furia_restante - delta, 0.0)
-	escudo_restante = maxf(escudo_restante - delta, 0.0)
-	for id in cd_hab.keys():
-		cd_hab[id] = maxf(cd_hab[id] - delta, 0.0)
-	gcd -= delta
-	if gcd > 0.0 or not inimigo.vivo or not heroi.vivo:
-		return
-	for id in estado.personagem.hab_slots:
-		if id == "" or cd_hab.get(id, 0.0) > 0.0:
-			continue
-		var h: Dictionary = estado.personagem.habilidade_por_id(id)
-		if h["tipo"] == "cura" and heroi.vida > heroi.vida_max * 0.85:
-			continue
-		if h["tipo"] == "buff_dano" and furia_restante > 0.0:
-			continue
-		if h["tipo"] == "escudo" and escudo_restante > 0.0:
-			continue
-		_usa_habilidade(h)
-		cd_hab[id] = h["cd"]
-		gcd = Cfg.GCD_HABILIDADE
-		return
-
-func _usa_habilidade(h: Dictionary) -> void:
-	var f: float = estado.personagem.fator_habilidade(h["id"])
-	_nome_habilidade(h["nome"])
-	match h["tipo"]:
-		"dano":
-			heroi.animacao_ataque(1.0)
-			for g in h["golpes"]:
-				var dano: float = heroi.dano * (1.0 + _furia_valor()) * h["mult"] * f
-				var crit: bool = randf() < estado.personagem.crit_chance()
-				if crit:
-					dano *= estado.personagem.crit_mult()
-				inimigo.recebe_dano(dano)
-				_numero_de_dano(inimigo, dano, false, crit)
-				if not inimigo.vivo:
-					_inimigo_morreu()
-					return
-		"cura":
-			var quanto: float = heroi.vida_max * h["valor"] * f
-			heroi.cura(quanto)
-			_numero_de_dano(heroi, quanto, false, false, Color(0.4, 1.0, 0.5))
-		"buff_dano":
-			furia_restante = h["duracao"]
-		"escudo":
-			escudo_restante = h["duracao"]
-
-func _nome_habilidade(nome: String) -> void:
-	var l := Label.new()
-	l.text = nome + "!"
-	l.add_theme_font_size_override("font_size", 26)
-	l.add_theme_color_override("font_color", Color(0.6, 0.9, 1.0))
-	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 6)
-	l.position = heroi.position + Vector2(-70, -heroi.get_child(0).size.y - 90)
-	add_child(l)
-	var t := create_tween().set_parallel(true)
-	t.tween_property(l, "position:y", l.position.y - 30, 1.0)
-	t.tween_property(l, "modulate:a", 0.0, 1.0).set_delay(0.4)
-	t.chain().tween_callback(l.queue_free)
 func _numero_de_dano(alvo: Control, valor: float, no_heroi: bool, crit: bool, cor: Color = Color(0, 0, 0, 0)) -> void:
 	var l := Label.new()
 	l.text = ("%d!" if crit else "%d") % roundi(valor)
@@ -383,8 +314,7 @@ func _derrota(motivo: String) -> void:
 	_atualiza_hud()
 
 func _levanta() -> void:
-	furia_restante = 0.0
-	escudo_restante = 0.0
+	skills.reset()
 	heroi.modulate = Color.WHITE
 	heroi.vivo = true
 	heroi.vida = heroi.vida_max
@@ -406,8 +336,7 @@ func _sincroniza() -> void:
 func _mostra_drop(info: Dictionary) -> void:
 	var it: Dictionary = info["item"]
 	var r: Dictionary = Cfg.RARIDADES[it["raridade"]]
-	var acao := "equipado" if info["equipou"] else "vendido +%d ouro" % info["ouro"]
-	_msg_drop.text = "Drop: %s (%s) - %s" % [estado.equipamento.nome_item(it), estado.equipamento.descricao_item(it), acao]
+	_msg_drop.text = "Drop: %s (%s) - %s" % [estado.equipamento.nome_item(it), estado.equipamento.descricao_item(it), info["acao"]]
 	_msg_drop.add_theme_color_override("font_color", r["cor"])
 	_msg_drop.modulate.a = 1.0
 	var t := create_tween()
@@ -433,7 +362,7 @@ func _atualiza_comida() -> void:
 			l.text = "(vazio)"
 		else:
 			var h: Dictionary = estado.personagem.habilidade_por_id(id)
-			var cd: float = cd_hab.get(id, 0.0)
+			var cd: float = skills.cd.get(id, 0.0)
 			l.text = h["nome"] + ("\npronto" if cd <= 0.0 else "\n%.1f s" % cd)
 	var partes: Array = []
 	for sl in estado.comida.slots_comida:

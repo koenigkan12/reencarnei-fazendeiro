@@ -8,6 +8,7 @@ var atributos := {}           # id -> nivel
 var talentos := {}            # id -> rank
 var hab_niveis := {}          # id da habilidade -> nivel (>= 1)
 var hab_slots: Array = []     # ids na ordem de uso ("" = vazio)
+var _talento_da_skill := {}   # id da habilidade -> id do talento que a libera
 
 func _init(estado) -> void:
 	e = estado
@@ -20,6 +21,9 @@ func _init(estado) -> void:
 	hab_slots.resize(Cfg.SLOTS_HABILIDADE)
 	hab_slots.fill("")
 	hab_slots[0] = "golpe"
+	for t in Cfg.TALENTOS:
+		if t["efeito"] == "skill":
+			_talento_da_skill[t["skill"]] = t["id"]
 
 # ---------- talentos ----------
 func talento(efeito: String) -> float:
@@ -46,7 +50,10 @@ func pode_talento(i: int) -> bool:
 
 func sobe_talento(i: int) -> void:
 	if pode_talento(i):
-		talentos[Cfg.TALENTOS[i]["id"]] += 1
+		var t: Dictionary = Cfg.TALENTOS[i]
+		talentos[t["id"]] += 1
+		if t["efeito"] == "skill":
+			_equipa_se_houver_vaga(t["skill"])
 		e.notifica()
 
 func custo_reset_talentos() -> int:
@@ -58,6 +65,9 @@ func reseta_talentos() -> bool:
 	e.ouro -= custo_reset_talentos()
 	for t in Cfg.TALENTOS:
 		talentos[t["id"]] = 0
+	for k in hab_slots.size():
+		if hab_slots[k] != "" and not habilidade_liberada_id(hab_slots[k]):
+			hab_slots[k] = ""
 	e.notifica()
 	return true
 
@@ -105,7 +115,7 @@ func crit_mult() -> float:
 	return Cfg.HEROI_CRIT_MULT + _atr("dano_critico") * _bonus("dano_critico") + talento("crit_mult")
 
 func intervalo() -> float:
-	return Cfg.HEROI_INTERVALO / (1.0 + _atr("vel_ataque") * _bonus("vel_ataque"))
+	return Cfg.HEROI_INTERVALO / (1.0 + _atr("vel_ataque") * _bonus("vel_ataque") + talento("vel_pct"))
 
 func regen_pct() -> float:
 	return Cfg.HEROI_REGEN_PCT + _atr("recuperacao") * _bonus("recuperacao") + talento("regen") + e.comida.buff("regen")
@@ -138,11 +148,54 @@ func compra_atributo(i: int) -> bool:
 	return true
 
 # ---------- habilidades ----------
+# Uma habilidade esta liberada se e a inicial ou se o talento que a libera tem ponto
+func habilidade_liberada_id(id: String) -> bool:
+	var h := habilidade_por_id(id)
+	if h.is_empty():
+		return false
+	return h.get("inicial", false) or (_talento_da_skill.has(id) and talentos[_talento_da_skill[id]] > 0)
+
 func habilidade_liberada(i: int) -> bool:
-	return e.nivel >= Cfg.HABILIDADES[i]["nivel"]
+	return habilidade_liberada_id(Cfg.HABILIDADES[i]["id"])
 
 func fator_habilidade(id: String) -> float:
 	return 1.0 + Cfg.HABILIDADE_BONUS_POR_NIVEL * (hab_niveis[id] - 1)
+
+# multiplicador final do dano das habilidades: talentos de skill_pct e afinidade da arma com o estilo da habilidade
+func dano_habilidade_mult(h: Dictionary) -> float:
+	return (1.0 + talento("skill_pct")) * afinidade(h["estilo"])
+
+# multiplicador da recarga das habilidades (talento "recarga_pct", no minimo 40% da recarga)
+func recarga_mult() -> float:
+	return maxf(1.0 - talento("recarga_pct"), 0.4)
+
+# arma do mesmo estilo da habilidade = AFINIDADE_CERTA; outra arma ou sem arma = AFINIDADE_ERRADA
+func afinidade(estilo: String) -> float:
+	var arma = e.equipamento.equipado[0]
+	if arma != null and Cfg.TIPOS_ARMA[arma["tipo"]]["estilo"] == estilo:
+		return Cfg.AFINIDADE_CERTA
+	return Cfg.AFINIDADE_ERRADA
+
+# estilo dominante entre as habilidades equipadas ("" se nao ha nenhuma): e o que o jogador "e"
+func estilo_dominante() -> String:
+	var cont := {}
+	for id in hab_slots:
+		if id != "":
+			var est: String = habilidade_por_id(id)["estilo"]
+			cont[est] = cont.get(est, 0) + 1
+	var melhor := ""
+	for est in cont:
+		if melhor == "" or cont[est] > cont[melhor]:
+			melhor = est
+	return melhor
+
+func nome_estilo() -> String:
+	var est := estilo_dominante()
+	if est == "":
+		return "Sem estilo"
+	var arma = e.equipamento.equipado[0]
+	var combina: bool = arma != null and Cfg.TIPOS_ARMA[arma["tipo"]]["estilo"] == est
+	return "%s%s" % [Cfg.ESTILOS[est]["nome"], " (arma combina)" if combina else " (arma não combina)"]
 
 func custo_habilidade(i: int) -> int:
 	return floori(Cfg.HABILIDADE_CUSTO_BASE * pow(Cfg.HABILIDADE_CUSTO_CRESC, hab_niveis[Cfg.HABILIDADES[i]["id"]] - 1))
@@ -164,15 +217,36 @@ func define_slot_habilidade(slot: int, id: String) -> void:
 	hab_slots[slot] = id
 	e.notifica()
 
+func _equipa_se_houver_vaga(id: String) -> void:
+	if not hab_slots.has(id):
+		var livre := hab_slots.find("")
+		if livre != -1:
+			hab_slots[livre] = id
+
+# Compatibilidade com estado.gd: as habilidades agora sao liberadas pelos talentos (ver sobe_talento)
 func equipa_habilidades_novas() -> void:
-	for h in Cfg.HABILIDADES:
-		if e.nivel == h["nivel"] and not hab_slots.has(h["id"]):
-			var livre := hab_slots.find("")
-			if livre != -1:
-				hab_slots[livre] = h["id"]
+	pass
 
 func habilidade_por_id(id: String) -> Dictionary:
 	for h in Cfg.HABILIDADES:
 		if h["id"] == id:
 			return h
 	return {}
+
+# ---------- salvar ----------
+func para_dict() -> Dictionary:
+	return {"atributos": atributos.duplicate(), "talentos": talentos.duplicate(), "hab_niveis": hab_niveis.duplicate(), "hab_slots": hab_slots.duplicate()}
+
+func de_dict(d: Dictionary) -> void:
+	for k in d.get("atributos", {}):
+		if atributos.has(k):
+			atributos[k] = int(d["atributos"][k])
+	for k in d.get("talentos", {}):
+		if talentos.has(k):
+			talentos[k] = int(d["talentos"][k])
+	for k in d.get("hab_niveis", {}):
+		if hab_niveis.has(k):
+			hab_niveis[k] = int(d["hab_niveis"][k])
+	var slots: Array = d.get("hab_slots", [])
+	for k in mini(slots.size(), hab_slots.size()):
+		hab_slots[k] = slots[k] if habilidade_liberada_id(slots[k]) else ""
