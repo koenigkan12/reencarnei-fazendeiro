@@ -1,0 +1,128 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[bal] #1 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #1 min 0.5: fase 2  nivel 3  CP 121  derrotas 0
+[bal] #1 min 0.9: fase 3  nivel 5  CP 186  derrotas 0
+[bal] #1 min 1.2: fase 4  nivel 6  CP 211  derrotas 0
+[bal] #1 min 1.5: fase 5  nivel 7  CP 265  derrotas 0
+[bal] #1 min 1.9: fase 6  nivel 8  CP 310  derrotas 0
+[bal] #1 min 2.2: fase 7  nivel 9  CP 406  derrotas 0
+[bal] #1 min 2.5: fase 8  nivel 10  CP 442  derrotas 0
+[bal] #1 min 2.8: fase 9  nivel 10  CP 469  derrotas 0
+[bal] #1 min 3.2: fase 10  nivel 11  CP 516  derrotas 0
+[bal] #1 min 3.9: fase 11  nivel 12  CP 608  derrotas 0
+[bal] #1 min 4.3: fase 12  nivel 13  CP 670  derrotas 0
+[bal] #1 min 4.9: fase 13  nivel 13  CP 915  derrotas 0
+[bal] #1 min 5.6: fase 14  nivel 14  CP 969  derrotas 0
+[bal] #1 min 6.3: fase 15  nivel 14  CP 1147  derrotas 0
+[bal] #1 min 7.1: fase 16  nivel 15  CP 1769  derrotas 0
+[bal] #1 min 7.5: fase 17  nivel 16  CP 1899  derrotas 0
+[bal] #1 min 8.0: fase 18  nivel 16  CP 2035  derrotas 0
+[bal] #1 min 8.8: fase 19  nivel 17  CP 2129  derrotas 0
+[bal] #1 min 9.5: fase 20  nivel 17  CP 2203  derrotas 0
+[bal] #1 min 10.9: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3691 ataque 270 intervalo 0.81 CP 2269 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 12.4: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3735 ataque 314 intervalo 0.78 CP 2657 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 13.9: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3735 ataque 422 intervalo 0.78 CP 3441 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 15.5: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3760 ataque 426 intervalo 0.78 CP 3476 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 17.2: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3779 ataque 432 intervalo 0.78 CP 3552 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 18.6: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3779 ataque 432 intervalo 0.76 CP 3669 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 20.2: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3804 ataque 432 intervalo 0.76 CP 3672 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 min 21.6: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3804 ataque 436 intervalo 0.76 CP 3700 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #1 VITORIA em 22.9 min de jogo, 8 derrotas, nivel 20, CP 4590
+[bal] #2 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #2 min 0.6: fase 2  nivel 3  CP 113  derrotas 0
+[bal] #2 min 0.9: fase 3  nivel 5  CP 170  derrotas 0
+[bal] #2 min 1.2: fase 4  nivel 6  CP 206  derrotas 0
+[bal] #2 min 1.5: fase 5  nivel 7  CP 263  derrotas 0
+[bal] #2 min 2.0: fase 6  nivel 9  CP 326  derrotas 0
+[bal] #2 min 2.3: fase 7  nivel 9  CP 350  derrotas 0
+[bal] #2 min 2.6: fase 8  nivel 10  CP 399  derrotas 0
+[bal] #2 min 2.9: fase 9  nivel 10  CP 403  derrotas 0
+[bal] #2 min 3.4: fase 10  nivel 11  CP 443  derrotas 0
+[bal] #2 min 4.1: fase 11  nivel 12  CP 532  derrotas 0
+[bal] #2 min 4.6: fase 12  nivel 13  CP 676  derrotas 0
+[bal] #2 min 5.1: fase 13  nivel 13  CP 684  derrotas 0
+[bal] #2 min 5.7: fase 14  nivel 14  CP 798  derrotas 0
+[bal] #2 min 6.5: fase 15  nivel 14  CP 825  derrotas 0
+[bal] #2 min 7.6: fase 16  nivel 15  CP 1430  derrotas 0
+[bal] #2 min 8.2: fase 17  nivel 16  CP 2624  derrotas 0
+[bal] #2 min 8.7: fase 18  nivel 16  CP 2735  derrotas 0
+[bal] #2 min 9.2: fase 19  nivel 17  CP 2932  derrotas 0
+[bal] #2 min 9.6: fase 20  nivel 17  CP 3254  derrotas 0
+[bal] #2 VITORIA em 10.6 min de jogo, 0 derrotas, nivel 18, CP 4632
+[bal] #3 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #3 min 0.6: fase 2  nivel 3  CP 97  derrotas 0
+[bal] #3 min 0.9: fase 3  nivel 5  CP 148  derrotas 0
+[bal] #3 min 1.3: fase 4  nivel 6  CP 197  derrotas 0
+[bal] #3 min 1.7: fase 5  nivel 7  CP 235  derrotas 0
+[bal] #3 min 2.0: fase 6  nivel 8  CP 341  derrotas 0
+[bal] #3 min 2.3: fase 7  nivel 9  CP 381  derrotas 0
+[bal] #3 min 2.6: fase 8  nivel 10  CP 400  derrotas 0
+[bal] #3 min 3.0: fase 9  nivel 10  CP 420  derrotas 0
+[bal] #3 min 3.4: fase 10  nivel 11  CP 463  derrotas 0
+[bal] #3 min 4.1: fase 11  nivel 12  CP 761  derrotas 0
+[bal] #3 min 4.6: fase 12  nivel 13  CP 1034  derrotas 0
+[bal] #3 min 5.0: fase 13  nivel 13  CP 1218  derrotas 0
+[bal] #3 min 5.4: fase 14  nivel 14  CP 1374  derrotas 0
+[bal] #3 min 5.8: fase 15  nivel 14  CP 1449  derrotas 0
+[bal] #3 min 6.6: fase 16  nivel 15  CP 1537  derrotas 0
+[bal] #3 min 7.2: fase 17  nivel 16  CP 1762  derrotas 0
+[bal] #3 min 7.7: fase 18  nivel 16  CP 1827  derrotas 0
+[bal] #3 min 8.3: fase 19  nivel 17  CP 2117  derrotas 0
+[bal] #3 min 9.0: fase 20  nivel 17  CP 2146  derrotas 0
+[bal] #3 min 10.6: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3666 ataque 279 intervalo 0.78 CP 2388 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #3 min 12.3: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 3684 ataque 337 intervalo 0.78 CP 2827 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #3 min 13.9: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 5032 ataque 340 intervalo 0.78 CP 2994 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #3 min 15.6: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 5754 ataque 428 intervalo 0.78 CP 3693 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #3 min 17.1: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 5754 ataque 428 intervalo 0.78 CP 3722 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #3 VITORIA em 18.2 min de jogo, 5 derrotas, nivel 19, CP 4523
+[bal] #4 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #4 min 0.5: fase 2  nivel 3  CP 88  derrotas 0
+[bal] #4 min 1.0: fase 3  nivel 5  CP 127  derrotas 0
+[bal] #4 min 1.5: fase 4  nivel 7  CP 183  derrotas 0
+[bal] #4 min 1.9: fase 5  nivel 8  CP 207  derrotas 0
+[bal] #4 min 2.4: fase 6  nivel 9  CP 349  derrotas 0
+[bal] #4 min 2.7: fase 7  nivel 9  CP 376  derrotas 0
+[bal] #4 min 2.9: fase 8  nivel 10  CP 409  derrotas 0
+[bal] #4 min 3.3: fase 9  nivel 10  CP 412  derrotas 0
+[bal] #4 min 3.6: fase 10  nivel 11  CP 456  derrotas 0
+[bal] #4 min 4.4: fase 11  nivel 12  CP 570  derrotas 0
+[bal] #4 min 5.0: fase 12  nivel 13  CP 703  derrotas 0
+[bal] #4 min 5.6: fase 13  nivel 13  CP 790  derrotas 0
+[bal] #4 min 6.4: fase 14  nivel 14  CP 859  derrotas 0
+[bal] #4 min 7.2: fase 15  nivel 14  CP 1042  derrotas 0
+[bal] #4 min 8.4: fase 16  nivel 15  CP 1569  derrotas 0
+[bal] #4 min 9.1: fase 17  nivel 16  CP 1676  derrotas 0
+[bal] #4 min 9.7: fase 18  nivel 16  CP 2870  derrotas 0
+[bal] #4 min 10.3: fase 19  nivel 17  CP 3023  derrotas 0
+[bal] #4 min 10.8: fase 20  nivel 17  CP 3229  derrotas 0
+[bal] #4 min 12.1: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 2746 ataque 442 intervalo 0.81 CP 3346 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #4 min 13.6: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 2765 ataque 444 intervalo 0.78 CP 3487 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #4 min 15.1: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 2765 ataque 448 intervalo 0.78 CP 3538 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #4 VITORIA em 16.2 min de jogo, 3 derrotas, nivel 19, CP 3871
+[bal] #5 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #5 min 0.6: fase 2  nivel 3  CP 97  derrotas 0
+[bal] #5 min 0.9: fase 3  nivel 5  CP 139  derrotas 0
+[bal] #5 min 1.3: fase 4  nivel 6  CP 209  derrotas 0
+[bal] #5 min 1.7: fase 5  nivel 7  CP 244  derrotas 0
+[bal] #5 min 2.1: fase 6  nivel 8  CP 303  derrotas 0
+[bal] #5 min 2.4: fase 7  nivel 9  CP 343  derrotas 0
+[bal] #5 min 2.7: fase 8  nivel 10  CP 376  derrotas 0
+[bal] #5 min 3.1: fase 9  nivel 10  CP 381  derrotas 0
+[bal] #5 min 3.4: fase 10  nivel 11  CP 451  derrotas 0
+[bal] #5 min 4.3: fase 11  nivel 12  CP 529  derrotas 0
+[bal] #5 min 4.9: fase 12  nivel 13  CP 578  derrotas 0
+[bal] #5 min 5.5: fase 13  nivel 13  CP 817  derrotas 0
+[bal] #5 min 6.2: fase 14  nivel 14  CP 1269  derrotas 0
+[bal] #5 min 6.8: fase 15  nivel 14  CP 1276  derrotas 0
+[bal] #5 min 7.7: fase 16  nivel 15  CP 1656  derrotas 0
+[bal] #5 min 8.2: fase 17  nivel 16  CP 1683  derrotas 0
+[bal] #5 min 9.0: fase 18  nivel 16  CP 1783  derrotas 0
+[bal] #5 min 9.7: fase 19  nivel 17  CP 2079  derrotas 0
+[bal] #5 min 10.3: fase 20  nivel 17  CP 2133  derrotas 0
+[bal] #5 min 11.7: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 4547 ataque 315 intervalo 0.81 CP 2661 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #5 min 13.3: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 4566 ataque 318 intervalo 0.78 CP 2750 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #5 min 14.8: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 4591 ataque 321 intervalo 0.78 CP 2815 | inimigo: vida 66613 dano 510 intervalo 1.70
+[bal] #5 VITORIA em 16.3 min de jogo, 3 derrotas, nivel 19, CP 3583
+[bal] resumo: 5/5 partidas chegaram ao fim. minutos para vencer: [10.6, 16.2, 16.3, 18.2, 22.9]
+[bal] derrotas por fase (somando as partidas): { 20: 19 }

@@ -1,0 +1,29 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[teste-save] ok: salvar grava o arquivo
+[teste-save] ok: carregar devolve resultado
+[teste-save] ok: nivel e minerio
+[teste-save] ok: atributo e talento
+[teste-save] ok: nivel da habilidade
+[teste-save] ok: arma equipada com +2
+[teste-save] ok: mochila
+[teste-save] ok: lote plantado
+[teste-save] ok: sementes e colheita
+[teste-save] ok: cultivo e ferramentas
+[teste-save] FALHOU: pratos
+[teste-save] ok: fase da batalha
+[teste-save] ok: resumo offline existe
+[teste-save] ok: ganho offline de ouro (~7200)
+[teste-save] ok: lote regado ficou pronto
+ERROR: Parse JSON failed. Error at line 0: Expected key
+   at: parse_string (core/io/json.cpp:629)
+   GDScript backtrace (most recent call first):
+       [0] _le (res://scripts/salvamento.gd:63)
+       [1] carregar (res://scripts/salvamento.gd:71)
+       [2] _initialize (res://scripts/teste_salvamento.gd:89)
+[teste-save] ok: save corrompido: carrega do .bak
+[teste-save] 1 FALHA(S)
+WARNING: 25 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 6 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
