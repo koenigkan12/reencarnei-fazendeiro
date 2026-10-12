@@ -13,6 +13,7 @@ const AbaFazenda := preload("res://scripts/aba_fazenda.gd")
 const AbaLoja := preload("res://scripts/aba_loja.gd")
 const FazendaTela := preload("res://scripts/fazenda_tela.gd")
 const Fluxo := preload("res://scripts/fluxo.gd")
+const Salvamento := preload("res://scripts/salvamento.gd")
 
 var batalha: Control
 var estado := Estado.new()
@@ -58,6 +59,8 @@ func _ready() -> void:
 	abas.tab_changed.connect(_troca_aba)
 	raiz.add_child(abas)
 
+	estado.batalha = batalha     # o salvamento precisa da fase da batalha
+	estado.voltou_offline.connect(func(resumo: Dictionary): Salvamento.mostra_resumo(self, resumo))
 	var fluxo := Fluxo.new()    # menus, pausa, tutorial e fim da v1 (nao age nos modos de teste)
 	fluxo.main = self
 	add_child(fluxo)

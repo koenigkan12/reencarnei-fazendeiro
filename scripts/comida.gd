@@ -65,3 +65,10 @@ func de_dict(d: Dictionary) -> void:
 		var prato := int(src.get("prato", -1))
 		slots_comida[i] = {"prato": prato if prato < Cfg.PRATOS.size() else -1, "restante": float(src.get("restante", 0.0))}
 	e.notifica()
+
+# nomes alternativos usados pelo fluxo/menus
+func para_dicionario() -> Dictionary:
+	return para_dict()
+
+func de_dicionario(d: Dictionary) -> void:
+	de_dict(d)

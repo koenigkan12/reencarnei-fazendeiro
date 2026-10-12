@@ -1,10 +1,9 @@
 extends RefCounted
 # Salvamento e ganho offline. Tudo estatico: Salvamento.salvar(estado, batalha), Salvamento.carregar(estado, batalha),
-# Salvamento.existe_save(), Salvamento.apagar(), Salvamento.instala_autosave(pai, estado, batalha) e
-# Salvamento.mostra_resumo(pai, resumo). O arquivo e um JSON em Cfg.SAVE_ARQUIVO.
+# Salvamento.existe_save(), Salvamento.apagar() e Salvamento.mostra_resumo(pai, resumo).
+# O menu/fluxo usa os atalhos em estado.gd: existe_save(), salva(), carrega(), apaga_save(). O arquivo e um JSON em Cfg.SAVE_ARQUIVO.
 # O que cada sistema guarda esta em para_dict()/de_dict() do proprio sistema.
 const Cfg := preload("res://scripts/cfg.gd")
-const Autosave := preload("res://scripts/autosave.gd")
 const TelaOffline := preload("res://scripts/tela_offline.gd")
 
 # Taxa de ouro e XP de combate por segundo (antes dos bonus), medida em janela deslizante e guardada no save
@@ -45,7 +44,7 @@ static func salvar(estado, batalha) -> bool:
 		"equipamento": estado.equipamento.para_dict(),
 		"fazenda": estado.fazenda.para_dict(),
 		"comida": estado.comida.para_dict(),
-		"batalha": {"fase": batalha.fase, "abates": batalha.abates, "derrotas": batalha.derrotas, "vitoria_final": batalha.vitoria_final},
+		"batalha": {"fase": batalha.fase, "abates": batalha.abates, "derrotas": batalha.derrotas, "vitoria_final": batalha.vitoria_final, "endgame": batalha.endgame},
 	}
 	var tmp: String = Cfg.SAVE_ARQUIVO + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
@@ -98,6 +97,7 @@ static func _restaura_batalha(batalha, b: Dictionary) -> void:
 	batalha.abates = clampi(int(b.get("abates", 0)), 0, Cfg.INIMIGOS_POR_FASE)
 	batalha.derrotas = int(b.get("derrotas", 0))
 	batalha.vitoria_final = bool(b.get("vitoria_final", false))
+	batalha.endgame = bool(b.get("endgame", false))
 	batalha.contra_chefe = false
 	batalha.descanso = 0.0
 	batalha._fundo.color = Color(0.22, 0.16, 0.28) if batalha.fase >= Cfg.ZONA2_A_PARTIR_DA_FASE else Color(0.16, 0.22, 0.28)
@@ -156,14 +156,6 @@ static func aplica_offline(estado, segundos: float) -> Dictionary:
 		"eficiencia": Cfg.OFFLINE_EFICIENCIA}
 
 # ---------- ligacao com a interface ----------
-# Cria o no que salva sozinho a cada Cfg.AUTOSAVE_SEGUNDOS e ao fechar a janela
-static func instala_autosave(pai: Node, estado, batalha) -> Node:
-	var n := Autosave.new()
-	n.estado = estado
-	n.batalha = batalha
-	pai.add_child(n)
-	return n
-
 # Mostra a tela "Bem-vindo de volta" por cima de pai (nao faz nada se o resumo for vazio)
 static func mostra_resumo(pai: Control, resumo: Dictionary) -> void:
 	if resumo.is_empty():

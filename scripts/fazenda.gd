@@ -229,3 +229,10 @@ func de_dict(d: Dictionary) -> void:
 func _copia_ints(origem: Array, destino: Array) -> void:
 	for i in mini(origem.size(), destino.size()):
 		destino[i] = int(origem[i])
+
+# nomes alternativos usados pelo fluxo/menus
+func para_dicionario() -> Dictionary:
+	return para_dict()
+
+func de_dicionario(d: Dictionary) -> void:
+	de_dict(d)

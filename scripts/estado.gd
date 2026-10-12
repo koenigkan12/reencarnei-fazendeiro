@@ -7,9 +7,11 @@ const Equipamento := preload("res://scripts/equipamento.gd")
 const Fazenda := preload("res://scripts/fazenda.gd")
 const Loja := preload("res://scripts/loja.gd")
 const Comida := preload("res://scripts/comida.gd")
+const Salvamento := preload("res://scripts/salvamento.gd")
 
 signal mudou               # qualquer numero mudou (no maximo uma vez por quadro; a UI so le)
 signal item_dropou(info)   # info: {item, equipou, ouro}
+signal voltou_offline(resumo)   # carrega() aplicou ganho offline; main.gd mostra a tela de resumo
 
 var ouro := 0.0
 var nivel := 1
@@ -23,6 +25,7 @@ var equipamento
 var fazenda
 var loja
 var comida
+var batalha                   # registrada por main.gd (estado.batalha = batalha); o save precisa da fase
 
 var _sujo := false
 
@@ -63,6 +66,28 @@ func tick(delta: float) -> void:
 		_sujo = false
 		mudou.emit()
 
+# ---------- salvar / carregar (usados pelo fluxo dos menus; ver salvamento.gd) ----------
+func existe_save() -> bool:
+	return Salvamento.existe_save()
+
+func salva() -> bool:
+	return batalha != null and Salvamento.salvar(self, batalha)
+
+# Carrega o save no estado atual; devolve false se nao ha save. Se houve ganho offline, emite voltou_offline.
+func carrega() -> bool:
+	if batalha == null:
+		return false
+	var r: Dictionary = Salvamento.carregar(self, batalha)
+	if r.is_empty():
+		return false
+	var resumo: Dictionary = r.get("offline", {})
+	if not resumo.is_empty():
+		voltou_offline.emit(resumo)
+	return true
+
+func apaga_save() -> void:
+	Salvamento.apagar()
+
 # Desfaz as referencias circulares (subsistema <-> estado) ao fechar o jogo
 func libera() -> void:
 	personagem.e = null
@@ -70,3 +95,4 @@ func libera() -> void:
 	fazenda.e = null
 	loja.e = null
 	comida.e = null
+	batalha = null
