@@ -75,9 +75,9 @@ func _escolhe(id: String) -> void:
 func _process(_delta: float) -> void:
 	if not is_visible_in_tree():
 		return
-	_cabecalho.text = "Fazenda   Cultivo Nv %d" % estado.cultivo_nivel
-	_barra.max_value = estado.cultivo_xp_para_subir()
-	_barra.value = estado.cultivo_xp
+	_cabecalho.text = "Fazenda   Cultivo Nv %d" % estado.fazenda.cultivo_nivel
+	_barra.max_value = estado.fazenda.cultivo_xp_para_subir()
+	_barra.value = estado.fazenda.cultivo_xp
 	_info.text = "Minério: %d    Ouro: %d" % [estado.minerio, floori(estado.ouro)]
-	var c: Dictionary = Cfg.CULTURAS[estado.semente_selecionada]
-	_sel.text = "Semente: %s (%d)   |   Dica: ara com a Enxada, planta, rega — a planta só cresce molhada" % [c["nome"], estado.sementes[estado.semente_selecionada]]
+	var c: Dictionary = Cfg.CULTURAS[estado.fazenda.semente_selecionada]
+	_sel.text = "Semente: %s (%d)   |   Dica: ara com a Enxada, planta, rega — a planta só cresce molhada" % [c["nome"], estado.fazenda.sementes[estado.fazenda.semente_selecionada]]

@@ -1,0 +1,160 @@
+extends RefCounted
+# Sistema FAZENDA: terreno em grade, ferramentas (enxada, regador, picareta), sementes, crescimento
+# (so cresce regado), colheita, rochas/minerio e o Cultivo (habilidade do heroi). Compras ficam em loja.gd.
+const Cfg := preload("res://scripts/cfg.gd")
+
+var e                         # Estado (raiz)
+
+func _init(estado) -> void:
+	e = estado
+	for i in Cfg.LINHAS * Cfg.COLUNAS:
+		terreno.append({"t": 0, "cultura": -1, "prog": 0.0, "agua": 0.0})
+		if randf() < Cfg.ROCHA_INICIAL_CHANCE:
+			terreno[i]["t"] = 2
+	sementes[0] = 3
+
+# terreno: Cfg.LINHAS x Cfg.COLUNAS (indice = y * COLUNAS + x)
+# t: 0 grama, 1 terra, 2 rocha ; cultura -1 vazio ; prog = segundos regados de crescimento ; agua = segundos de agua restante
+var terreno: Array = []
+var sementes: Array = [0, 0, 0]
+var colheita: Array = [0, 0, 0]
+var cultivo_nivel := 1
+var cultivo_xp := 0.0
+var semente_selecionada := 0
+var ferramentas := {"enxada": 1, "regador": 1, "picareta": 1}
+var irrigacao := 0
+var _timer_rocha := 0.0
+
+func colunas_abertas() -> int:
+	return mini(Cfg.COLUNAS, Cfg.COLUNAS_INICIAIS + cultivo_nivel - 1)
+
+func lote_aberto(x: int, y: int) -> bool:
+	return x >= 0 and y >= 0 and y < Cfg.LINHAS and x < colunas_abertas()
+
+func lote(x: int, y: int) -> Dictionary:
+	return terreno[y * Cfg.COLUNAS + x]
+
+func cultivo_xp_para_subir() -> float:
+	return Cfg.CULTIVO_XP_BASE * pow(Cfg.CULTIVO_XP_CRESC, cultivo_nivel - 1)
+
+func cultura_liberada(i: int) -> bool:
+	return cultivo_nivel >= Cfg.CULTURAS[i]["nivel"]
+
+func agua_segundos() -> float:
+	return Cfg.AGUA_SEGUNDOS + irrigacao * Cfg.AGUA_POR_IRRIGACAO
+
+func lote_pronto(x: int, y: int) -> bool:
+	var l := lote(x, y)
+	return l["cultura"] != -1 and l["prog"] >= Cfg.CULTURAS[l["cultura"]]["tempo"]
+
+# Aplica a ferramenta no lote (x, y); a area depende do nivel da ferramenta.
+func usa_ferramenta(nome: String, x: int, y: int) -> void:
+	var raio := 0
+	if ferramentas.has(nome):
+		raio = ferramentas[nome] - 1
+	var mudou_algo := false
+	for dy in range(-raio, raio + 1):
+		for dx in range(-raio, raio + 1):
+			if _aplica(nome, x + dx, y + dy):
+				mudou_algo = true
+	if mudou_algo:
+		e.notifica()
+
+func _aplica(nome: String, x: int, y: int) -> bool:
+	if not lote_aberto(x, y):
+		return false
+	var l := lote(x, y)
+	match nome:
+		"enxada":
+			if l["t"] == 0:
+				l["t"] = 1
+				return true
+		"regador":
+			if l["t"] == 1:
+				l["agua"] = agua_segundos()
+				return true
+		"picareta":
+			if l["t"] == 2:
+				l["t"] = 0
+				e.minerio += randi_range(Cfg.ROCHA_MINERIO_MIN, Cfg.ROCHA_MINERIO_MAX)
+				return true
+		"semente":
+			if l["t"] == 1 and l["cultura"] == -1 and sementes[semente_selecionada] > 0:
+				sementes[semente_selecionada] -= 1
+				l["cultura"] = semente_selecionada
+				l["prog"] = 0.0
+				return true
+		"mao":
+			return _colhe(x, y)
+	return false
+
+func _colhe(x: int, y: int) -> bool:
+	if not lote_pronto(x, y):
+		return false
+	var l := lote(x, y)
+	var c: int = l["cultura"]
+	colheita[c] += roundi(Cfg.RENDIMENTO * (1.0 + e.personagem.talento("colheita_pct")))
+	l["cultura"] = -1
+	l["prog"] = 0.0
+	cultivo_xp += Cfg.CULTURAS[c]["xp"]
+	while cultivo_xp >= cultivo_xp_para_subir():
+		cultivo_xp -= cultivo_xp_para_subir()
+		cultivo_nivel += 1
+	if cultivo_nivel >= Cfg.AUTOPLANTIO_NIVEL and sementes[c] > 0:
+		sementes[c] -= 1       # replantio automatico
+		l["cultura"] = c
+	return true
+
+# Tenta fazer a semente cair de um inimigo (so das culturas que o Cultivo ja libera)
+func tenta_semente(chefe: bool) -> void:
+	if not chefe and randf() > Cfg.SEMENTE_CHANCE:
+		return
+	var total := 0.0
+	for i in Cfg.CULTURAS.size():
+		if cultura_liberada(i):
+			total += Cfg.CULTURAS[i]["peso"]
+	var r := randf() * total
+	var escolhida := 0
+	for i in Cfg.CULTURAS.size():
+		if cultura_liberada(i):
+			r -= Cfg.CULTURAS[i]["peso"]
+			if r <= 0.0:
+				escolhida = i
+				break
+	sementes[escolhida] += Cfg.SEMENTES_CHEFE if chefe else 1
+	e.notifica()
+
+func vende_colheita(cultura: int) -> void:
+	e.ouro += colheita[cultura] * Cfg.CULTURAS[cultura]["preco"]
+	colheita[cultura] = 0
+	e.notifica()
+
+
+# Chamado todo quadro (a fazenda cresce mesmo com outra aba aberta)
+func tick(delta: float) -> void:
+	var vel: float = 1.0 + cultivo_nivel * Cfg.CULTIVO_CRESCIMENTO_POR_NIVEL + e.personagem.talento("crescimento_pct")
+	for y in Cfg.LINHAS:
+		for x in colunas_abertas():
+			var l := lote(x, y)
+			if l["agua"] > 0.0:
+				l["agua"] = maxf(l["agua"] - delta, 0.0)
+				if l["cultura"] != -1:
+					l["prog"] += delta * vel
+	_timer_rocha += delta
+	if _timer_rocha >= Cfg.ROCHA_RESPAWN_SEGUNDOS:
+		_timer_rocha = 0.0
+		_nasce_rocha()
+
+func _nasce_rocha() -> void:
+	var rochas := 0
+	var livres: Array = []
+	for y in Cfg.LINHAS:
+		for x in colunas_abertas():
+			var l := lote(x, y)
+			if l["t"] == 2:
+				rochas += 1
+			elif l["t"] == 0:
+				livres.append(l)
+	if rochas < Cfg.ROCHA_MAX and not livres.is_empty():
+		livres[randi() % livres.size()]["t"] = 2
+

@@ -20,11 +20,11 @@ func _ready() -> void:
 		h.add_child(rot)
 		var b1 := Button.new()
 		b1.custom_minimum_size = Vector2(130, 30)
-		b1.pressed.connect(func(): estado.compra_semente(i, 1))
+		b1.pressed.connect(func(): estado.loja.compra_semente(i, 1))
 		h.add_child(b1)
 		var b5 := Button.new()
 		b5.custom_minimum_size = Vector2(130, 30)
-		b5.pressed.connect(func(): estado.compra_semente(i, 5))
+		b5.pressed.connect(func(): estado.loja.compra_semente(i, 5))
 		h.add_child(b5)
 		add_child(h)
 		_sem.append({"rotulo": rot, "b1": b1, "b5": b5})
@@ -43,7 +43,7 @@ func _ready() -> void:
 		var bt := Button.new()
 		bt.custom_minimum_size = Vector2(170, 30)
 		var id: String = f["id"]
-		bt.pressed.connect(func(): estado.melhora_ferramenta(id))
+		bt.pressed.connect(func(): estado.loja.melhora_ferramenta(id))
 		grade.add_child(bt)
 		_ferr.append({"rotulo": rot, "botao": bt})
 	var rot2 := Label.new()
@@ -51,7 +51,7 @@ func _ready() -> void:
 	grade.add_child(rot2)
 	var bt2 := Button.new()
 	bt2.custom_minimum_size = Vector2(170, 30)
-	bt2.pressed.connect(func(): estado.melhora_irrigacao())
+	bt2.pressed.connect(func(): estado.loja.melhora_irrigacao())
 	grade.add_child(bt2)
 	_irr = {"rotulo": rot2, "botao": bt2}
 	estado.mudou.connect(_atualiza)
@@ -61,10 +61,10 @@ func _atualiza() -> void:
 	for i in Cfg.CULTURAS.size():
 		var c: Dictionary = Cfg.CULTURAS[i]
 		var l: Dictionary = _sem[i]
-		var lib: bool = estado.cultura_liberada(i)
+		var lib: bool = estado.fazenda.cultura_liberada(i)
 		var p: int = floori(c["semente"])
 		if lib:
-			l["rotulo"].text = "Semente de %s  (%d ouro cada, cresce em %d s regada)  você tem: %d" % [c["nome"], p, roundi(c["tempo"]), estado.sementes[i]]
+			l["rotulo"].text = "Semente de %s  (%d ouro cada, cresce em %d s regada)  você tem: %d" % [c["nome"], p, roundi(c["tempo"]), estado.fazenda.sementes[i]]
 		else:
 			l["rotulo"].text = "Semente de %s  (libera no Cultivo nível %d)" % [c["nome"], c["nivel"]]
 		l["b1"].text = "Comprar 1: %d" % p
@@ -74,16 +74,16 @@ func _atualiza() -> void:
 	for k in Cfg.FERRAMENTAS.size():
 		var f: Dictionary = Cfg.FERRAMENTAS[k]
 		var l: Dictionary = _ferr[k]
-		l["rotulo"].text = "%s  nível %d" % [f["nome"], estado.ferramentas[f["id"]]]
-		var c: int = estado.custo_ferramenta(f["id"])
+		l["rotulo"].text = "%s  nível %d" % [f["nome"], estado.fazenda.ferramentas[f["id"]]]
+		var c: int = estado.loja.custo_ferramenta(f["id"])
 		if c < 0:
 			l["botao"].text = "MÁXIMO"
 			l["botao"].disabled = true
 		else:
 			l["botao"].text = "Melhorar: %d" % c
 			l["botao"].disabled = estado.ouro < c
-	_irr["rotulo"].text = "Irrigação  nível %d  (lote regado fica úmido %d s)" % [estado.irrigacao, roundi(estado.agua_segundos())]
-	var ci: int = estado.custo_irrigacao()
+	_irr["rotulo"].text = "Irrigação  nível %d  (lote regado fica úmido %d s)" % [estado.fazenda.irrigacao, roundi(estado.fazenda.agua_segundos())]
+	var ci: int = estado.loja.custo_irrigacao()
 	if ci < 0:
 		_irr["botao"].text = "MÁXIMO"
 		_irr["botao"].disabled = true

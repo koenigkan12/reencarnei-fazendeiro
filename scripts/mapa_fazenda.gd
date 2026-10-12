@@ -34,7 +34,7 @@ func _gui_input(ev: InputEvent) -> void:
 
 func _aplica(l: Vector2i) -> void:
 	if l.x >= 0 and l.y >= 0 and l.x < Cfg.COLUNAS and l.y < Cfg.LINHAS:
-		estado.usa_ferramenta(ferramenta, l.x, l.y)
+		estado.fazenda.usa_ferramenta(ferramenta, l.x, l.y)
 
 func _process(_delta: float) -> void:
 	if is_visible_in_tree():
@@ -49,11 +49,11 @@ func _draw() -> void:
 	for y in Cfg.LINHAS:
 		for x in Cfg.COLUNAS:
 			var r := Rect2(o + Vector2(x, y) * t, Vector2(t, t))
-			if not estado.lote_aberto(x, y):
+			if not estado.fazenda.lote_aberto(x, y):
 				draw_rect(r, Color(0.18, 0.2, 0.18))
 				draw_rect(r, Color(0, 0, 0, 0.35), false, 1.0)
 				continue
-			var l: Dictionary = estado.lote(x, y)
+			var l: Dictionary = estado.fazenda.lote(x, y)
 			var grama := Color(0.34, 0.58, 0.27) if (x + y) % 2 == 0 else Color(0.31, 0.54, 0.25)
 			draw_rect(r, grama)
 			if l["t"] == 1:
@@ -76,9 +76,9 @@ func _draw() -> void:
 					draw_circle(r.position + Vector2(t * 0.82, t * 0.2), t * 0.1, Color(0.3, 0.6, 1.0))   # precisa de agua
 			draw_rect(r, Color(0, 0, 0, 0.25), false, 1.0)
 	# destaque da area da ferramenta
-	if estado.lote_aberto(_hover.x, _hover.y):
+	if estado.fazenda.lote_aberto(_hover.x, _hover.y):
 		var raio := 0
-		if estado.ferramentas.has(ferramenta):
-			raio = estado.ferramentas[ferramenta] - 1
+		if estado.fazenda.ferramentas.has(ferramenta):
+			raio = estado.fazenda.ferramentas[ferramenta] - 1
 		var ra := Rect2(o + Vector2(_hover.x - raio, _hover.y - raio) * t, Vector2(t, t) * (2 * raio + 1))
 		draw_rect(ra, Color(1, 1, 1, 0.9), false, 2.0)

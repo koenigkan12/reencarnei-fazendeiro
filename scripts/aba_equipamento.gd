@@ -21,7 +21,7 @@ func _ready() -> void:
 		h.add_child(l)
 		var bt := Button.new()
 		bt.custom_minimum_size = Vector2(230, 34)
-		bt.pressed.connect(func(): estado.melhora_item(i))
+		bt.pressed.connect(func(): estado.equipamento.melhora_item(i))
 		h.add_child(bt)
 		add_child(h)
 		_linhas.append({"rotulo": l, "botao": bt})
@@ -33,9 +33,9 @@ func _ready() -> void:
 	_atualiza()
 
 func _atualiza() -> void:
-	_cp.text = "Poder de combate (CP): %d      Minério: %d" % [estado.cp(), estado.minerio]
+	_cp.text = "Poder de combate (CP): %d      Minério: %d" % [estado.personagem.cp(), estado.minerio]
 	for i in Cfg.SLOTS.size():
-		var it = estado.equipado[i]
+		var it = estado.equipamento.equipado[i]
 		var l: Label = _linhas[i]["rotulo"]
 		var bt: Button = _linhas[i]["botao"]
 		if it == null:
@@ -44,11 +44,11 @@ func _atualiza() -> void:
 			bt.text = "—"
 			bt.disabled = true
 		else:
-			l.text = "%s:  %s  (%s)" % [Cfg.SLOTS[i], estado.nome_item(it), estado.descricao_item(it)]
+			l.text = "%s:  %s  (%s)" % [Cfg.SLOTS[i], estado.equipamento.nome_item(it), estado.equipamento.descricao_item(it)]
 			l.add_theme_color_override("font_color", Cfg.RARIDADES[it["raridade"]]["cor"])
 			if it["mais"] >= Cfg.MAIS_MAX:
 				bt.text = "MÁXIMO (+%d)" % Cfg.MAIS_MAX
 				bt.disabled = true
 			else:
-				bt.text = "Melhorar: %d ouro + %d minério" % [estado.custo_mais_ouro(i), estado.custo_mais_minerio(i)]
-				bt.disabled = not estado.pode_melhorar(i)
+				bt.text = "Melhorar: %d ouro + %d minério" % [estado.equipamento.custo_mais_ouro(i), estado.equipamento.custo_mais_minerio(i)]
+				bt.disabled = not estado.equipamento.pode_melhorar(i)

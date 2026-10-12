@@ -50,7 +50,7 @@ func _ready() -> void:
 
 	heroi = Unidade.new()
 	add_child(heroi)
-	heroi.configura("Herói", Color(0.3, 0.5, 0.95), Vector2(50, 90), estado.vida_max(), estado.ataque(), estado.intervalo())
+	heroi.configura("Herói", Color(0.3, 0.5, 0.95), Vector2(50, 90), estado.personagem.vida_max(), estado.personagem.ataque(), estado.personagem.intervalo())
 	inimigo = Unidade.new()
 	add_child(inimigo)
 	_novo_inimigo()
@@ -208,7 +208,7 @@ func _process(delta: float) -> void:
 		return
 	if vitoria_final:
 		return
-	heroi.cura(heroi.vida_max * estado.regen_pct() * delta)
+	heroi.cura(heroi.vida_max * estado.personagem.regen_pct() * delta)
 	_tick_habilidades(delta)
 	if contra_chefe:
 		tempo_chefe -= delta
@@ -240,23 +240,23 @@ func _ataca(atacante: Control, alvo: Control, direcao: float) -> void:
 	atacante.animacao_ataque(direcao)
 	if atacante == heroi:
 		var dano: float = atacante.dano * (1.0 + _furia_valor())
-		var crit: bool = randf() < estado.crit_chance()
+		var crit: bool = randf() < estado.personagem.crit_chance()
 		if crit:
-			dano *= estado.crit_mult()
+			dano *= estado.personagem.crit_mult()
 		alvo.recebe_dano(dano)
 		_numero_de_dano(alvo, dano, false, crit)
 	else:
-		var dano2: float = atacante.dano * estado.reducao_dano()
+		var dano2: float = atacante.dano * estado.personagem.reducao_dano()
 		if escudo_restante > 0.0:
 			dano2 *= 1.0 - _escudo_valor()
 		alvo.recebe_dano(dano2)
 		_numero_de_dano(alvo, dano2, true, false)
 
 func _furia_valor() -> float:
-	return Cfg.HABILIDADES[3]["valor"] * estado.fator_habilidade("furia") if furia_restante > 0.0 else 0.0
+	return Cfg.HABILIDADES[3]["valor"] * estado.personagem.fator_habilidade("furia") if furia_restante > 0.0 else 0.0
 
 func _escudo_valor() -> float:
-	return minf(Cfg.HABILIDADES[4]["valor"] * estado.fator_habilidade("escudo"), 0.9)
+	return minf(Cfg.HABILIDADES[4]["valor"] * estado.personagem.fator_habilidade("escudo"), 0.9)
 
 # Habilidades automaticas: a cada GCD usa a primeira pronta da esquerda para a direita
 func _tick_habilidades(delta: float) -> void:
@@ -267,10 +267,10 @@ func _tick_habilidades(delta: float) -> void:
 	gcd -= delta
 	if gcd > 0.0 or not inimigo.vivo or not heroi.vivo:
 		return
-	for id in estado.hab_slots:
+	for id in estado.personagem.hab_slots:
 		if id == "" or cd_hab.get(id, 0.0) > 0.0:
 			continue
-		var h: Dictionary = estado.habilidade_por_id(id)
+		var h: Dictionary = estado.personagem.habilidade_por_id(id)
 		if h["tipo"] == "cura" and heroi.vida > heroi.vida_max * 0.85:
 			continue
 		if h["tipo"] == "buff_dano" and furia_restante > 0.0:
@@ -283,16 +283,16 @@ func _tick_habilidades(delta: float) -> void:
 		return
 
 func _usa_habilidade(h: Dictionary) -> void:
-	var f: float = estado.fator_habilidade(h["id"])
+	var f: float = estado.personagem.fator_habilidade(h["id"])
 	_nome_habilidade(h["nome"])
 	match h["tipo"]:
 		"dano":
 			heroi.animacao_ataque(1.0)
 			for g in h["golpes"]:
 				var dano: float = heroi.dano * (1.0 + _furia_valor()) * h["mult"] * f
-				var crit: bool = randf() < estado.crit_chance()
+				var crit: bool = randf() < estado.personagem.crit_chance()
 				if crit:
-					dano *= estado.crit_mult()
+					dano *= estado.personagem.crit_mult()
 				inimigo.recebe_dano(dano)
 				_numero_de_dano(inimigo, dano, false, crit)
 				if not inimigo.vivo:
@@ -343,8 +343,8 @@ func _inimigo_morreu() -> void:
 	var subiu: bool = estado.ganha(inimigo.get_meta("ouro"), inimigo.get_meta("xp"))
 	if subiu:
 		heroi.vida = heroi.vida_max
-	estado.tenta_drop(fase, era_chefe)
-	estado.tenta_semente(era_chefe)
+	estado.equipamento.tenta_drop(fase, era_chefe)
+	estado.fazenda.tenta_semente(era_chefe)
 	if era_chefe:
 		contra_chefe = false
 		_barra_chefe.visible = false
@@ -396,10 +396,10 @@ func _levanta() -> void:
 # ---------- sincronia com o Estado ----------
 func _sincroniza() -> void:
 	var razao: float = heroi.vida / heroi.vida_max
-	heroi.vida_max = estado.vida_max()
+	heroi.vida_max = estado.personagem.vida_max()
 	heroi.vida = minf(razao * heroi.vida_max + 0.0, heroi.vida_max)
-	heroi.dano = estado.ataque()
-	heroi.intervalo = estado.intervalo()
+	heroi.dano = estado.personagem.ataque()
+	heroi.intervalo = estado.personagem.intervalo()
 	heroi.atualiza_barra()
 	_atualiza_hud()
 
@@ -407,7 +407,7 @@ func _mostra_drop(info: Dictionary) -> void:
 	var it: Dictionary = info["item"]
 	var r: Dictionary = Cfg.RARIDADES[it["raridade"]]
 	var acao := "equipado" if info["equipou"] else "vendido +%d ouro" % info["ouro"]
-	_msg_drop.text = "Drop: %s (%s) - %s" % [estado.nome_item(it), estado.descricao_item(it), acao]
+	_msg_drop.text = "Drop: %s (%s) - %s" % [estado.equipamento.nome_item(it), estado.equipamento.descricao_item(it), acao]
 	_msg_drop.add_theme_color_override("font_color", r["cor"])
 	_msg_drop.modulate.a = 1.0
 	var t := create_tween()
@@ -415,7 +415,7 @@ func _mostra_drop(info: Dictionary) -> void:
 	t.tween_property(_msg_drop, "modulate:a", 0.0, 0.8)
 
 func _atualiza_hud() -> void:
-	_hud_texto.text = "Nível %d      Ouro: %d      CP: %d" % [estado.nivel, floori(estado.ouro), estado.cp()]
+	_hud_texto.text = "Nível %d      Ouro: %d      CP: %d" % [estado.nivel, floori(estado.ouro), estado.personagem.cp()]
 	_barra_xp.max_value = estado.xp_para_subir()
 	_barra_xp.value = estado.xp
 	var rot := "Fase %d/%d   Inimigos %d/%d" % [fase, Cfg.FASES_TOTAL, abates, Cfg.INIMIGOS_POR_FASE]
@@ -427,16 +427,16 @@ func _atualiza_hud() -> void:
 
 func _atualiza_comida() -> void:
 	for i in _caixas_hab.size():
-		var id: String = estado.hab_slots[i]
+		var id: String = estado.personagem.hab_slots[i]
 		var l: Label = _caixas_hab[i]["rotulo"]
 		if id == "":
 			l.text = "(vazio)"
 		else:
-			var h: Dictionary = estado.habilidade_por_id(id)
+			var h: Dictionary = estado.personagem.habilidade_por_id(id)
 			var cd: float = cd_hab.get(id, 0.0)
 			l.text = h["nome"] + ("\npronto" if cd <= 0.0 else "\n%.1f s" % cd)
 	var partes: Array = []
-	for sl in estado.slots_comida:
+	for sl in estado.comida.slots_comida:
 		if sl["prato"] == -1:
 			partes.append("[vazio]")
 		elif sl["restante"] > 0.0:

@@ -22,15 +22,15 @@ func _ready() -> void:
 		sel.toggle_mode = true
 		sel.button_group = grupo
 		sel.custom_minimum_size = Vector2(190, 32)
-		sel.button_pressed = (i == estado.semente_selecionada)
-		sel.pressed.connect(func(): estado.semente_selecionada = i)
+		sel.button_pressed = (i == estado.fazenda.semente_selecionada)
+		sel.pressed.connect(func(): estado.fazenda.semente_selecionada = i)
 		h.add_child(sel)
 		var info := Label.new()
 		info.custom_minimum_size = Vector2(110, 0)
 		h.add_child(info)
 		var vende := Button.new()
 		vende.custom_minimum_size = Vector2(150, 32)
-		vende.pressed.connect(func(): estado.vende_colheita(i))
+		vende.pressed.connect(func(): estado.fazenda.vende_colheita(i))
 		h.add_child(vende)
 		col.add_child(h)
 		_linhas.append({"sel": sel, "info": info, "vende": vende})
@@ -54,7 +54,7 @@ func _ready() -> void:
 		h.add_child(rot)
 		var bt := Button.new()
 		bt.custom_minimum_size = Vector2(190, 32)
-		bt.pressed.connect(func(): estado.cozinha(i))
+		bt.pressed.connect(func(): estado.comida.cozinha(i))
 		h.add_child(bt)
 		col2.add_child(h)
 		_cozinha.append({"rotulo": rot, "botao": bt})
@@ -70,8 +70,8 @@ func _ready() -> void:
 		ob.add_item("(vazio)", 0)
 		for p in Cfg.PRATOS:
 			ob.add_item(p["nome"])
-		ob.select(estado.slots_comida[s]["prato"] + 1)
-		ob.item_selected.connect(func(idx: int): estado.define_slot_comida(s, idx - 1))
+		ob.select(estado.comida.slots_comida[s]["prato"] + 1)
+		ob.item_selected.connect(func(idx: int): estado.comida.define_slot_comida(s, idx - 1))
 		hs.add_child(ob)
 	estado.mudou.connect(_atualiza)
 	_atualiza()
@@ -80,15 +80,15 @@ func _atualiza() -> void:
 	for i in Cfg.CULTURAS.size():
 		var cul: Dictionary = Cfg.CULTURAS[i]
 		var l: Dictionary = _linhas[i]
-		var lib: bool = estado.cultura_liberada(i)
+		var lib: bool = estado.fazenda.cultura_liberada(i)
 		l["sel"].disabled = not lib
-		l["sel"].text = "%s (%d sementes)" % [cul["nome"], estado.sementes[i]] if lib else "%s (Cultivo Nv %d)" % [cul["nome"], cul["nivel"]]
-		l["info"].text = "Colheita: %d" % estado.colheita[i]
-		l["vende"].text = "Vender: +%d ouro" % floori(estado.colheita[i] * cul["preco"])
-		l["vende"].disabled = estado.colheita[i] <= 0
+		l["sel"].text = "%s (%d sementes)" % [cul["nome"], estado.fazenda.sementes[i]] if lib else "%s (Cultivo Nv %d)" % [cul["nome"], cul["nivel"]]
+		l["info"].text = "Colheita: %d" % estado.fazenda.colheita[i]
+		l["vende"].text = "Vender: +%d ouro" % floori(estado.fazenda.colheita[i] * cul["preco"])
+		l["vende"].disabled = estado.fazenda.colheita[i] <= 0
 	for i in Cfg.PRATOS.size():
 		var p: Dictionary = Cfg.PRATOS[i]
 		var c: Dictionary = _cozinha[i]
-		c["rotulo"].text = "%s (%s, %d s)  estoque: %d" % [p["nome"], p["desc"], roundi(p["duracao"]), estado.pratos[i]]
+		c["rotulo"].text = "%s (%s, %d s)  estoque: %d" % [p["nome"], p["desc"], roundi(p["duracao"]), estado.comida.pratos[i]]
 		c["botao"].text = "Cozinhar: %d %s" % [Cfg.COZINHA_CUSTO, Cfg.CULTURAS[i]["nome"]]
-		c["botao"].disabled = estado.colheita[i] < Cfg.COZINHA_CUSTO
+		c["botao"].disabled = estado.fazenda.colheita[i] < Cfg.COZINHA_CUSTO

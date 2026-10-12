@@ -43,7 +43,7 @@ func _monta_atributos() -> Control:
 	grade.add_theme_constant_override("v_separation", 6)
 	for i in Cfg.ATRIBUTOS.size():
 		var l := _linha(grade, 300, 150)
-		l["botao"].pressed.connect(func(): estado.compra_atributo(i))
+		l["botao"].pressed.connect(func(): estado.personagem.compra_atributo(i))
 		_attr.append(l)
 	return grade
 
@@ -59,7 +59,7 @@ func _monta_habilidades() -> Control:
 	for s in Cfg.SLOTS_HABILIDADE:
 		var ob := OptionButton.new()
 		ob.custom_minimum_size = Vector2(170, 30)
-		ob.item_selected.connect(func(idx: int): estado.define_slot_habilidade(s, ob.get_item_metadata(idx)))
+		ob.item_selected.connect(func(idx: int): estado.personagem.define_slot_habilidade(s, ob.get_item_metadata(idx)))
 		topo.add_child(ob)
 		_slots.append(ob)
 	v.add_child(topo)
@@ -70,7 +70,7 @@ func _monta_habilidades() -> Control:
 	v.add_child(grade)
 	for i in Cfg.HABILIDADES.size():
 		var l := _linha(grade, 300, 150)
-		l["botao"].pressed.connect(func(): estado.sobe_habilidade(i))
+		l["botao"].pressed.connect(func(): estado.personagem.sobe_habilidade(i))
 		_hab_rot.append(l)
 	return v
 
@@ -83,7 +83,7 @@ func _monta_talentos() -> Control:
 	_pontos = Label.new()
 	topo.add_child(_pontos)
 	_reset = Button.new()
-	_reset.pressed.connect(func(): estado.reseta_talentos())
+	_reset.pressed.connect(func(): estado.personagem.reseta_talentos())
 	topo.add_child(_reset)
 	v.add_child(topo)
 	var ramos := HBoxContainer.new()
@@ -109,7 +109,7 @@ func _monta_talentos() -> Control:
 		var bt := Button.new()
 		bt.text = "+"
 		bt.custom_minimum_size = Vector2(36, 28)
-		bt.pressed.connect(func(): estado.sobe_talento(i))
+		bt.pressed.connect(func(): estado.personagem.sobe_talento(i))
 		h.add_child(bt)
 		colunas[t["ramo"]].add_child(h)
 		_tal.append({"rotulo": rot, "botao": bt})
@@ -117,21 +117,21 @@ func _monta_talentos() -> Control:
 
 func _atualiza() -> void:
 	_status.text = "Nível %d   |   Vida %d   Ataque %d   Defesa %d   Crítico %d%% (x%.2f)   Vel. %.2f/s   Regen %.1f%%/s   |   CP %d" % [
-		estado.nivel, roundi(estado.vida_max()), roundi(estado.ataque()), roundi(estado.defesa()),
-		roundi(estado.crit_chance() * 100.0), estado.crit_mult(), 1.0 / estado.intervalo(), estado.regen_pct() * 100.0, estado.cp()]
+		estado.nivel, roundi(estado.personagem.vida_max()), roundi(estado.personagem.ataque()), roundi(estado.personagem.defesa()),
+		roundi(estado.personagem.crit_chance() * 100.0), estado.personagem.crit_mult(), 1.0 / estado.personagem.intervalo(), estado.personagem.regen_pct() * 100.0, estado.personagem.cp()]
 	for i in Cfg.ATRIBUTOS.size():
 		var a: Dictionary = Cfg.ATRIBUTOS[i]
 		var l: Dictionary = _attr[i]
-		l["rotulo"].text = "%s  Nv %d   (%s)" % [a["nome"], estado.atributos[a["id"]], a["desc"]]
-		if estado.atributo_no_maximo(i):
+		l["rotulo"].text = "%s  Nv %d   (%s)" % [a["nome"], estado.personagem.atributos[a["id"]], a["desc"]]
+		if estado.personagem.atributo_no_maximo(i):
 			l["botao"].text = "MÁXIMO"
 			l["botao"].disabled = true
 		else:
-			var c: int = estado.custo_atributo(i)
+			var c: int = estado.personagem.custo_atributo(i)
 			l["botao"].text = "Comprar: %d" % c
 			l["botao"].disabled = estado.ouro < c
 	# habilidades
-	var chave := str(estado.nivel >= 0) + str(estado.hab_slots) + str(_liberadas())
+	var chave := str(estado.nivel >= 0) + str(estado.personagem.hab_slots) + str(_liberadas())
 	if chave != _chave_slots:
 		_chave_slots = chave
 		_reconstroi_slots()
@@ -140,7 +140,7 @@ func _atualiza() -> void:
 func _liberadas() -> int:
 	var n := 0
 	for i in Cfg.HABILIDADES.size():
-		if estado.habilidade_liberada(i):
+		if estado.personagem.habilidade_liberada(i):
 			n += 1
 	return n
 
@@ -152,10 +152,10 @@ func _reconstroi_slots() -> void:
 		ob.set_item_metadata(0, "")
 		var sel := 0
 		for i in Cfg.HABILIDADES.size():
-			if estado.habilidade_liberada(i):
+			if estado.personagem.habilidade_liberada(i):
 				ob.add_item(Cfg.HABILIDADES[i]["nome"])
 				ob.set_item_metadata(ob.item_count - 1, Cfg.HABILIDADES[i]["id"])
-				if estado.hab_slots[k] == Cfg.HABILIDADES[i]["id"]:
+				if estado.personagem.hab_slots[k] == Cfg.HABILIDADES[i]["id"]:
 					sel = ob.item_count - 1
 		ob.select(sel)
 
@@ -163,9 +163,9 @@ func _atualiza_resto() -> void:
 	for i in Cfg.HABILIDADES.size():
 		var h: Dictionary = Cfg.HABILIDADES[i]
 		var l: Dictionary = _hab_rot[i]
-		if estado.habilidade_liberada(i):
-			l["rotulo"].text = "%s  Nv %d  (%s, recarga %d s)" % [h["nome"], estado.hab_niveis[h["id"]], h["desc"], roundi(h["cd"])]
-			var c: int = estado.custo_habilidade(i)
+		if estado.personagem.habilidade_liberada(i):
+			l["rotulo"].text = "%s  Nv %d  (%s, recarga %d s)" % [h["nome"], estado.personagem.hab_niveis[h["id"]], h["desc"], roundi(h["cd"])]
+			var c: int = estado.personagem.custo_habilidade(i)
 			l["botao"].text = "Melhorar: %d" % c
 			l["botao"].disabled = estado.ouro < c
 		else:
@@ -173,17 +173,17 @@ func _atualiza_resto() -> void:
 			l["botao"].text = "Bloqueada"
 			l["botao"].disabled = true
 	# talentos
-	_pontos.text = "Pontos de talento: %d  (1 por nível)" % estado.pontos_talento()
-	_reset.text = "Resetar talentos (%d ouro)" % estado.custo_reset_talentos()
-	_reset.disabled = estado.pontos_talento_gastos() == 0 or estado.ouro < estado.custo_reset_talentos()
+	_pontos.text = "Pontos de talento: %d  (1 por nível)" % estado.personagem.pontos_talento()
+	_reset.text = "Resetar talentos (%d ouro)" % estado.personagem.custo_reset_talentos()
+	_reset.disabled = estado.personagem.pontos_talento_gastos() == 0 or estado.ouro < estado.personagem.custo_reset_talentos()
 	for i in Cfg.TALENTOS.size():
 		var t: Dictionary = Cfg.TALENTOS[i]
 		var l: Dictionary = _tal[i]
 		var req := ""
-		if t["req"] != "" and estado.talentos[t["req"]] == 0:
+		if t["req"] != "" and estado.personagem.talentos[t["req"]] == 0:
 			req = "  [requer %s]" % _nome_talento(t["req"])
-		l["rotulo"].text = "%s %d/%d  (%s)%s" % [t["nome"], estado.talentos[t["id"]], t["max"], t["desc"], req]
-		l["botao"].disabled = not estado.pode_talento(i)
+		l["rotulo"].text = "%s %d/%d  (%s)%s" % [t["nome"], estado.personagem.talentos[t["id"]], t["max"], t["desc"], req]
+		l["botao"].disabled = not estado.personagem.pode_talento(i)
 
 func _nome_talento(id: String) -> String:
 	for t in Cfg.TALENTOS:

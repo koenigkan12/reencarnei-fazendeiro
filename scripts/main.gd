@@ -78,6 +78,9 @@ func _atualiza_topo() -> void:
 	batalha.visible = not mostra_fazenda
 	_voltar.visible = na_fazenda and _vendo_batalha
 
+func _exit_tree() -> void:
+	estado.libera()
+
 # A fazenda e a comida andam com qualquer aba aberta
 func _process(delta: float) -> void:
 	estado.tick(delta)
@@ -113,8 +116,8 @@ func _roda_teste() -> void:
 			await get_tree().create_timer(5.0).timeout
 			_bot()
 		print("[teste] min %d: fase %d (%d/%d)%s nivel %d, ouro %d, CP %d, derrotas %d, cultivo %d, minerio %d, atr %s, equip %s" % [
-			minuto, batalha.fase, batalha.abates, Cfg.INIMIGOS_POR_FASE, " CHEFE" if batalha.contra_chefe else "", estado.nivel, estado.ouro, estado.cp(),
-			batalha.derrotas, estado.cultivo_nivel, estado.minerio, str(estado.atributos.values()), str(estado.equipado.map(func(x): return "-" if x == null else estado.nome_item(x)))])
+			minuto, batalha.fase, batalha.abates, Cfg.INIMIGOS_POR_FASE, " CHEFE" if batalha.contra_chefe else "", estado.nivel, estado.ouro, estado.personagem.cp(),
+			batalha.derrotas, estado.fazenda.cultivo_nivel, estado.minerio, str(estado.personagem.atributos.values()), str(estado.equipamento.equipado.map(func(x): return "-" if x == null else estado.equipamento.nome_item(x)))])
 		if batalha.vitoria_final:
 			print("[teste] VITORIA FINAL")
 			break
@@ -122,34 +125,34 @@ func _roda_teste() -> void:
 
 func _bot() -> void:
 	# fazenda: compra trigo, escolhe a melhor semente, ara, planta, rega, colhe e quebra rochas
-	if estado.sementes[0] < 6:
-		estado.compra_semente(0, 5)
+	if estado.fazenda.sementes[0] < 6:
+		estado.loja.compra_semente(0, 5)
 	for c in [2, 1, 0]:
-		if estado.cultura_liberada(c) and estado.sementes[c] > 0:
-			estado.semente_selecionada = c
+		if estado.fazenda.cultura_liberada(c) and estado.fazenda.sementes[c] > 0:
+			estado.fazenda.semente_selecionada = c
 			break
 	for y in Cfg.LINHAS:
-		for x in estado.colunas_abertas():
+		for x in estado.fazenda.colunas_abertas():
 			for f in ["mao", "picareta", "enxada", "semente", "regador"]:
-				estado.usa_ferramenta(f, x, y)
+				estado.fazenda.usa_ferramenta(f, x, y)
 	for c in 3:
-		estado.cozinha(c)
-		estado.vende_colheita(c)
+		estado.comida.cozinha(c)
+		estado.fazenda.vende_colheita(c)
 	for f in Cfg.FERRAMENTAS:
-		estado.melhora_ferramenta(f["id"])
-	estado.melhora_irrigacao()
+		estado.loja.melhora_ferramenta(f["id"])
+	estado.loja.melhora_irrigacao()
 	# personagem
 	for i in 40:
-		if estado.pontos_talento() > 0:
+		if estado.personagem.pontos_talento() > 0:
 			for t in Cfg.TALENTOS.size():
-				estado.sobe_talento(t)
+				estado.personagem.sobe_talento(t)
 		var barato := 0
 		for u in Cfg.ATRIBUTOS.size():
-			if not estado.atributo_no_maximo(u) and estado.custo_atributo(u) < estado.custo_atributo(barato):
+			if not estado.personagem.atributo_no_maximo(u) and estado.personagem.custo_atributo(u) < estado.personagem.custo_atributo(barato):
 				barato = u
-		if not estado.compra_atributo(barato):
+		if not estado.personagem.compra_atributo(barato):
 			break
 	for h in Cfg.HABILIDADES.size():
-		estado.sobe_habilidade(h)
+		estado.personagem.sobe_habilidade(h)
 	for s in 3:
-		estado.melhora_item(s) if estado.equipado[s] != null else false
+		estado.equipamento.melhora_item(s) if estado.equipamento.equipado[s] != null else false
