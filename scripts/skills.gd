@@ -130,7 +130,7 @@ func _nome(h: Dictionary) -> void:
 	l.add_theme_constant_override("outline_size", 6)
 	l.position = b.heroi.position + Vector2(-70, -b.heroi.altura - 90)
 	b.add_child(l)
-	var t := b.create_tween().set_parallel(true)
+	var t: Tween = b.create_tween().set_parallel(true)
 	t.tween_property(l, "position:y", l.position.y - 30, 1.0)
 	t.tween_property(l, "modulate:a", 0.0, 1.0).set_delay(0.4)
 	t.chain().tween_callback(l.queue_free)
@@ -140,12 +140,12 @@ func _centro(u: Control) -> Vector2:
 
 func _pisca(u: Control, cor: Color) -> void:
 	u.modulate = cor
-	var t := b.create_tween()
+	var t: Tween = b.create_tween()
 	t.tween_property(u, "modulate", Color.WHITE, 0.25)
 
 func _treme(u: Control, forca: float) -> void:
 	var origem := u.position
-	var t := b.create_tween()
+	var t: Tween = b.create_tween()
 	for k in 5:
 		t.tween_property(u, "position", origem + Vector2(randf_range(-forca, forca), randf_range(-forca, forca) * 0.4), 0.03)
 		forca *= 0.7
@@ -169,7 +169,7 @@ func _particulas(pos: Vector2, cor: Color, qtd: int, direcao: Vector2, vmin: flo
 	p.color = cor
 	b.add_child(p)
 	p.emitting = true
-	var t := b.create_tween()
+	var t: Tween = b.create_tween()
 	t.tween_interval(1.2)
 	t.tween_callback(p.queue_free)
 
@@ -182,7 +182,7 @@ func _risco(pos: Vector2, cor: Color) -> void:
 	r.position = pos - r.size / 2.0
 	r.rotation = -0.6
 	b.add_child(r)
-	var t := b.create_tween()
+	var t: Tween = b.create_tween()
 	t.tween_property(r, "modulate:a", 0.0, 0.2)
 	t.tween_callback(r.queue_free)
 
@@ -196,7 +196,7 @@ func _arremessa(cor: Color, tamanho: Vector2, gira: bool, atraso: float = 0.0) -
 	r.visible = false
 	b.add_child(r)
 	var alvo := _centro(b.inimigo) - tamanho / 2.0
-	var t := b.create_tween()
+	var t: Tween = b.create_tween()
 	if atraso > 0.0:
 		t.tween_interval(atraso)
 	t.tween_callback(func(): r.visible = true)
@@ -212,6 +212,6 @@ func _raio(pos: Vector2, cor: Color) -> void:
 	r.size = Vector2(16, pos.y + 40)
 	r.position = Vector2(pos.x - 8, 0)
 	b.add_child(r)
-	var t := b.create_tween()
+	var t: Tween = b.create_tween()
 	t.tween_property(r, "modulate:a", 0.0, 0.25)
 	t.tween_callback(r.queue_free)
