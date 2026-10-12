@@ -4,6 +4,9 @@ extends Control
 
 const ABAS := ["Personagem", "Equipamento", "Fazenda", "Loja"]
 const ALTURA_PAINEL := 280
+const Batalha := preload("res://scripts/batalha.gd")
+
+var batalha: Control
 
 func _ready() -> void:
 	var raiz := VBoxContainer.new()
@@ -14,19 +17,15 @@ func _ready() -> void:
 	raiz.add_child(_cria_area_batalha())
 	raiz.add_child(_cria_painel_abas())
 
-func _cria_area_batalha() -> Control:
-	var area := ColorRect.new()
-	area.color = Color(0.16, 0.22, 0.28)
-	area.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	area.name = "AreaBatalha"
-	var rotulo := Label.new()
-	rotulo.text = "Área de batalha"
-	rotulo.set_anchors_preset(Control.PRESET_CENTER)
-	rotulo.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	rotulo.grow_vertical = Control.GROW_DIRECTION_BOTH
-	area.add_child(rotulo)
-	return area
+	if "--teste-batalha" in OS.get_cmdline_user_args():
+		_roda_teste()
 
+
+func _cria_area_batalha() -> Control:
+	batalha = Batalha.new()
+	batalha.name = "AreaBatalha"
+	batalha.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	return batalha
 func _cria_painel_abas() -> Control:
 	var abas := TabContainer.new()
 	abas.name = "PainelAbas"
@@ -39,3 +38,12 @@ func _cria_painel_abas() -> Control:
 		conteudo.add_child(texto)
 		abas.add_child(conteudo)
 	return abas
+
+# Teste headless: godot --headless --path . --quit-after 99999 -- --teste-batalha
+# Simula 5 minutos de jogo em ~15s reais e imprime o estado de minuto em minuto.
+func _roda_teste() -> void:
+	Engine.time_scale = 20.0
+	for minuto in range(1, 6):
+		await get_tree().create_timer(60.0).timeout
+		print("[teste] min %d: fase %d, abates %d, nivel %d, ouro %d, vida heroi %d/%d" % [minuto, batalha.fase, batalha.abates, batalha.nivel, batalha.ouro, batalha.heroi.vida, batalha.heroi.vida_max])
+	get_tree().quit()
