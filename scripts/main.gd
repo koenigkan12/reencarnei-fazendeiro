@@ -59,6 +59,9 @@ func _ready() -> void:
 
 	if "--teste-batalha" in OS.get_cmdline_user_args():
 		_roda_teste()
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--captura="):
+			_captura(arg.substr(10))
 
 # A tela de cima acompanha a aba: Fazenda mostra a fazenda; as outras mostram a batalha.
 # Na fazenda, o botao "Ver batalha" alterna. A batalha continua rodando escondida.
@@ -105,6 +108,18 @@ func _cria_painel_abas() -> TabContainer:
 		conteudo.add_child(aba)
 		painel.add_child(conteudo)
 	return painel
+
+# Tira um screenshot da janela (precisa rodar com tela, sem --headless):
+# godot --path . -- --captura=C:/pasta/shot.png [--aba=2]
+func _captura(caminho: String) -> void:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--aba="):
+			abas.current_tab = int(arg.substr(6))
+	Engine.time_scale = 6.0
+	await get_tree().create_timer(12.0).timeout
+	var img := get_viewport().get_texture().get_image()
+	img.save_png(caminho)
+	get_tree().quit()
 
 # Teste headless: godot --headless --path . --quit-after 99999 -- --teste-batalha
 # Simula 30 minutos de jogo em ~90s reais com um "jogador" automatico (compra, planta, rega, colhe,

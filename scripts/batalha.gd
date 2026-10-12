@@ -4,6 +4,7 @@ extends Control
 
 const Cfg := preload("res://scripts/cfg.gd")
 const Unidade := preload("res://scripts/unidade.gd")
+const Arte := preload("res://scripts/arte.gd")
 
 signal pede_aba(nome: String)
 
@@ -50,7 +51,7 @@ func _ready() -> void:
 
 	heroi = Unidade.new()
 	add_child(heroi)
-	heroi.configura("Herói", Color(0.3, 0.5, 0.95), Vector2(50, 90), estado.personagem.vida_max(), estado.personagem.ataque(), estado.personagem.intervalo())
+	heroi.configura("Herói", Color(0.3, 0.5, 0.95), Vector2(50, 90), estado.personagem.vida_max(), estado.personagem.ataque(), estado.personagem.intervalo(), Arte.heroi())
 	inimigo = Unidade.new()
 	add_child(inimigo)
 	_novo_inimigo()
@@ -103,7 +104,10 @@ func _cria_hud() -> void:
 		var l := Label.new()
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.custom_minimum_size = Vector2(110, 40)
+		l.add_theme_font_size_override("font_size", 13)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		p.add_child(l)
+		p.custom_minimum_size = Vector2(112, 44)
 		add_child(p)
 		_caixas_hab.append({"painel": p, "rotulo": l})
 	_msg_drop = Label.new()
@@ -169,14 +173,14 @@ func _novo_inimigo() -> void:
 		var c: Dictionary = Cfg.CHEFES[chefe_tipo]
 		var base: Dictionary = _lista_inimigos()[2]
 		inimigo.configura(c["nome"], c["cor"], c["tamanho"],
-			base["vida"] * c["vida_mult"] * pow(Cfg.ESCALA_VIDA, e), base["dano"] * c["dano_mult"] * pow(Cfg.ESCALA_DANO, e), base["intervalo"])
+			base["vida"] * c["vida_mult"] * pow(Cfg.ESCALA_VIDA, e), base["dano"] * c["dano_mult"] * pow(Cfg.ESCALA_DANO, e), base["intervalo"], Arte.inimigo(c["nome"]))
 		inimigo.set_meta("ouro", base["ouro"] * c["ouro_mult"] * pow(Cfg.ESCALA_OURO, e))
 		inimigo.set_meta("xp", base["xp"] * c["xp_mult"] * pow(Cfg.ESCALA_XP, e))
 	else:
 		var lista := _lista_inimigos()
 		var base2: Dictionary = lista[randi() % lista.size()]
 		inimigo.configura(base2["nome"], base2["cor"], base2["tamanho"],
-			base2["vida"] * pow(Cfg.ESCALA_VIDA, e), base2["dano"] * pow(Cfg.ESCALA_DANO, e), base2["intervalo"])
+			base2["vida"] * pow(Cfg.ESCALA_VIDA, e), base2["dano"] * pow(Cfg.ESCALA_DANO, e), base2["intervalo"], Arte.inimigo(base2["nome"]))
 		inimigo.set_meta("ouro", base2["ouro"] * pow(Cfg.ESCALA_OURO, e))
 		inimigo.set_meta("xp", base2["xp"] * pow(Cfg.ESCALA_XP, e))
 	inimigo.visible = true
@@ -314,7 +318,7 @@ func _nome_habilidade(nome: String) -> void:
 	l.add_theme_color_override("font_color", Color(0.6, 0.9, 1.0))
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 6)
-	l.position = heroi.position + Vector2(-70, -heroi.get_child(0).size.y - 90)
+	l.position = heroi.position + Vector2(-70, -heroi.altura - 90)
 	add_child(l)
 	var t := create_tween().set_parallel(true)
 	t.tween_property(l, "position:y", l.position.y - 30, 1.0)
@@ -330,14 +334,14 @@ func _numero_de_dano(alvo: Control, valor: float, no_heroi: bool, crit: bool, co
 	l.add_theme_color_override("font_color", c)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 4)
-	l.position = alvo.position + Vector2(randf_range(-20, 20), -alvo.get_child(0).size.y - 50)
+	l.position = alvo.position + Vector2(randf_range(-20, 20), -alvo.altura - 50)
 	add_child(l)
 	var t := create_tween().set_parallel(true)
 	t.tween_property(l, "position:y", l.position.y - 50, 0.7)
 	t.tween_property(l, "modulate:a", 0.0, 0.7)
 	t.chain().tween_callback(l.queue_free)
 func _inimigo_morreu() -> void:
-	inimigo.visible = false
+	inimigo.morte()
 	respawn = Cfg.RESPAWN_SEGUNDOS
 	var era_chefe := contra_chefe
 	var subiu: bool = estado.ganha(inimigo.get_meta("ouro"), inimigo.get_meta("xp"))
@@ -376,13 +380,14 @@ func _derrota(motivo: String) -> void:
 	contra_chefe = false
 	_barra_chefe.visible = false
 	abates = 0
-	heroi.modulate = Color(0.5, 0.5, 0.5)
+	heroi.morte()
 	inimigo.visible = false
 	_texto_derrota.text = motivo
 	_painel_derrota.visible = true
 	_atualiza_hud()
 
 func _levanta() -> void:
+	heroi.revive()
 	furia_restante = 0.0
 	escudo_restante = 0.0
 	heroi.modulate = Color.WHITE
