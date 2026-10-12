@@ -4,9 +4,15 @@ extends Control
 
 const ABAS := ["Personagem", "Equipamento", "Fazenda", "Loja"]
 const ALTURA_PAINEL := 280
+const Cfg := preload("res://scripts/cfg.gd")
 const Batalha := preload("res://scripts/batalha.gd")
+const Estado := preload("res://scripts/estado.gd")
+const AbaPersonagem := preload("res://scripts/aba_personagem.gd")
+const AbaEquipamento := preload("res://scripts/aba_equipamento.gd")
 
 var batalha: Control
+var estado := Estado.new()
+var abas: TabContainer
 var fazenda: Control
 var _indicador: Label
 
@@ -27,7 +33,7 @@ func _ready() -> void:
 	fazenda.set_anchors_preset(Control.PRESET_FULL_RECT)
 	fazenda.visible = false
 	topo.add_child(fazenda)
-	var abas := _cria_painel_abas()
+	abas = _cria_painel_abas()
 	abas.tab_changed.connect(_troca_aba)
 	raiz.add_child(abas)
 
@@ -37,6 +43,8 @@ func _ready() -> void:
 
 func _cria_area_batalha() -> Control:
 	batalha = Batalha.new()
+	batalha.estado = estado
+	batalha.pede_aba.connect(func(nome: String): abas.current_tab = ABAS.find(nome))
 	batalha.name = "AreaBatalha"
 	batalha.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	return batalha
@@ -87,24 +95,50 @@ func _process(_delta: float) -> void:
 	if fazenda.visible:
 		_indicador.text = "Luta: Fase %d  |  Vida do herói %d/%d  |  Ouro %d" % [batalha.fase, batalha.heroi.vida, batalha.heroi.vida_max, batalha.ouro]
 
-func _cria_painel_abas() -> Control:
-	var abas := TabContainer.new()
-	abas.name = "PainelAbas"
-	abas.custom_minimum_size = Vector2(0, ALTURA_PAINEL)
+func _cria_painel_abas() -> TabContainer:
+	var painel := TabContainer.new()
+	painel.name = "PainelAbas"
+	painel.custom_minimum_size = Vector2(0, ALTURA_PAINEL)
 	for nome in ABAS:
 		var conteudo := MarginContainer.new()
 		conteudo.name = nome
-		var texto := Label.new()
-		texto.text = "(%s: vazio)" % nome
-		conteudo.add_child(texto)
-		abas.add_child(conteudo)
-	return abas
-
+		conteudo.add_theme_constant_override("margin_left", 16)
+		conteudo.add_theme_constant_override("margin_top", 12)
+		conteudo.add_theme_constant_override("margin_right", 16)
+		match nome:
+			"Personagem":
+				var a := AbaPersonagem.new()
+				a.estado = estado
+				conteudo.add_child(a)
+			"Equipamento":
+				var a := AbaEquipamento.new()
+				a.estado = estado
+				conteudo.add_child(a)
+			_:
+				var texto := Label.new()
+				texto.text = "(%s: vazio)" % nome
+				conteudo.add_child(texto)
+		painel.add_child(conteudo)
+	return painel
 # Teste headless: godot --headless --path . --quit-after 99999 -- --teste-batalha
-# Simula 5 minutos de jogo em ~15s reais e imprime o estado de minuto em minuto.
+# Simula 30 minutos de jogo em ~90s reais, com um "jogador" que compra o upgrade mais barato
+# sempre que pode, e imprime o estado a cada minuto.
 func _roda_teste() -> void:
 	Engine.time_scale = 20.0
-	for minuto in range(1, 6):
-		await get_tree().create_timer(60.0).timeout
-		print("[teste] min %d: fase %d, abates %d, nivel %d, ouro %d, vida heroi %d/%d" % [minuto, batalha.fase, batalha.abates, batalha.nivel, batalha.ouro, batalha.heroi.vida, batalha.heroi.vida_max])
+	for minuto in range(1, 31):
+		for _s in 12:
+			await get_tree().create_timer(5.0).timeout
+			var i := 0
+			while i < 40:
+				var barato := 0
+				for u in 3:
+					if estado.custo_upgrade(u) < estado.custo_upgrade(barato):
+						barato = u
+				if not estado.compra_upgrade(barato):
+					break
+				i += 1
+		print("[teste] min %d: fase %d (%d/%d)%s nivel %d, ouro %d, CP %d, derrotas %d, upg %s, equip %s" % [minuto, batalha.fase, batalha.abates, Cfg.INIMIGOS_POR_FASE, " CHEFE" if batalha.contra_chefe else "", estado.nivel, estado.ouro, estado.cp(), batalha.derrotas, str(estado.upgrades), str(estado.equipado.map(func(x): return "-" if x == null else estado.nome_item(x)))])
+		if batalha.vitoria_final:
+			print("[teste] VITORIA FINAL")
+			break
 	get_tree().quit()
