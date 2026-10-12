@@ -210,3 +210,27 @@ const IRRIGACAO_AUTOREGA_NIVEL := 2   # a partir daqui a planta ja nasce regada 
 # Nivel de Cultivo minimo para subir cada ferramenta (indice 0: nivel 1->2, indice 1: 2->3)
 const FERRAMENTA_CULTIVO_MIN := {"enxada": [3, 6], "regador": [2, 5], "picareta": [4, 7]}
 const FLASH_SEGUNDOS := 0.3           # brilho curto no lote quando uma acao acontece (placeholder da animacao)
+
+
+# ================= MENUS, OPCOES, TUTORIAL E FIM DA V1 =================
+const TITULO_JOGO := "Reencarnei Fazendeiro"
+const FRASE_JOGO := "Todo isekai dá ao herói uma espada lendária. O meu me deu uma enxada."
+const VERSAO_JOGO := "v1 (build de teste)"
+const RESOLUCOES := [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080)]
+const AUTOSAVE_SEGUNDOS := 60.0       # o fluxo chama estado.salva() de tempos em tempos, se o save existir
+# Audio: o PC coloca os arquivos em AUDIO_PASTA com estes nomes (.ogg, .mp3 ou .wav). Sem arquivo = silencio.
+const AUDIO_PASTA := "res://assets/audio"
+const AUDIO_NOMES := {
+	"musica": ["menu", "jogo", "fim"],
+	"efeitos": ["clique", "tutorial_passo", "vitoria"],
+}
+# Tutorial de primeira vez. "aba" = aba que o tutorial abre naquele passo ("" = nenhuma).
+const TUTORIAL := [
+	{"titulo": "Bem-vindo, Chico!", "aba": "", "texto": "Você morreu, reencarnou num mundo de fantasia e ganhou a habilidade mais inútil possível: Cultivo.\nVamos ver como o jogo funciona em poucos passos."},
+	{"titulo": "A batalha é automática", "aba": "Personagem", "texto": "O herói luta sozinho. Cada inimigo derrotado dá ouro, XP e drops.\nA cada 10 inimigos você avança de fase. Chefes têm tempo limite: se o relógio zerar ou o herói cair, ele descansa e você volta mais forte."},
+	{"titulo": "Personagem", "aba": "Personagem", "texto": "Atributos: compre com ouro (ataque, vida, defesa...).\nTalentos: 1 ponto por nível. Alguns nós liberam habilidades.\nHabilidades: equipe até 4. Elas disparam sozinhas, da esquerda para a direita, quando a recarga acaba. O estilo (físico, mágico ou à distância) vem do que você equipa."},
+	{"titulo": "Equipamento", "aba": "Equipamento", "texto": "Drops vão para a mochila. Toque num item para ver o CP que ele daria e escolha Equipar ou Vender.\nArma do mesmo estilo da habilidade dá mais dano.\nMelhore itens com +N usando ouro e minério."},
+	{"titulo": "Fazenda", "aba": "Fazenda", "texto": "Escolha a ferramenta (teclas 1 a 6): enxada para arar, semente para plantar, regador para regar, mão para colher, picareta para quebrar rochas (dão minério).\nColher sobe o Cultivo e rende comida e dinheiro. A batalha continua por trás."},
+	{"titulo": "Loja", "aba": "Loja", "texto": "Compre sementes, melhore as ferramentas (terreno maior) e a irrigação (a água dura mais).\nPratos cozinhados dão bônus de vida, ataque ou regeneração nos slots de comida."},
+	{"titulo": "Objetivo", "aba": "Personagem", "texto": "Chegue ao chefe da fase 20 e derrote-o. Depois dele, dá para continuar jogando.\nPressione Esc a qualquer momento para pausar, salvar ou rever este tutorial."},
+]

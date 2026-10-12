@@ -29,6 +29,16 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 | `scripts/aba_loja.gd` | Aba Loja. |
 | `scripts/fazenda_tela.gd` | Tela de cima da fazenda: barra de ferramentas + mapa. |
 | `scripts/mapa_fazenda.gd` | Desenho e cliques do terreno. |
+| `scripts/fluxo.gd` | Fluxo do jogo (camada por cima de tudo): menu principal, pausa com Esc, opcoes, tutorial de primeira vez e tela de fim da v1. Pausa a arvore enquanto uma tela esta aberta; nao age em `--teste-batalha` nem `--captura`. |
+| `scripts/menu_principal.gd`, `menu_pausa.gd`, `tela_opcoes.gd`, `tutorial.gd`, `tela_fim.gd` | As telas do fluxo. Textos do tutorial, resolucoes e nomes de audio ficam em `cfg.gd`. |
+| `scripts/opcoes.gd` | Opcoes do jogador em `user://opcoes.cfg` (volumes, tela cheia, resolucao, tutorial visto, tempo jogado). |
+| `scripts/audio.gd` | Gancho de audio: toca `res://assets/audio/<nome>.ogg/.mp3/.wav` se existir (`Audio.toca_musica`, `Audio.toca_efeito`); nomes em `Cfg.AUDIO_NOMES`. |
+| `scripts/menu_util.gd` | Pecas de UI dos menus. |
+
+## Ganchos do fluxo
+- **Save:** o fluxo chama em `main.estado`, se existirem: `existe_save() -> bool`, `salva() -> bool`, `carrega() -> bool`, `apaga_save()`. Sem eles, "Continuar" fica desabilitado. Autosave a cada `Cfg.AUTOSAVE_SEGUNDOS`. `personagem` e `equipamento` tem `para_dicionario()`/`de_dicionario(d)` como a fazenda.
+- **Audio:** colocar os arquivos em `assets/audio/` com os nomes de `Cfg.AUDIO_NOMES`.
+- **Fim da v1:** o fluxo detecta `batalha.vitoria_final`; "Continuar jogando" chama `batalha.continua_apos_vitoria()`.
 
 ## Convencoes
 - Chamar sistemas pelo estado: `estado.personagem.vida_max()`, `estado.fazenda.usa_ferramenta(...)`.

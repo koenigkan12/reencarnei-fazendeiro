@@ -171,6 +171,12 @@ func melhora_item(slot: int) -> bool:
 	return true
 
 # ---------- salvar ----------
+func para_dicionario() -> Dictionary:
+	return para_dict()
+
+func de_dicionario(d: Dictionary) -> void:
+	de_dict(d)
+
 func para_dict() -> Dictionary:
 	return {"equipado": equipado.duplicate(true), "mochila": mochila.duplicate(true), "auto_equipar": auto_equipar}
 

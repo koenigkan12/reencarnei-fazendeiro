@@ -12,6 +12,7 @@ const AbaEquipamento := preload("res://scripts/aba_equipamento.gd")
 const AbaFazenda := preload("res://scripts/aba_fazenda.gd")
 const AbaLoja := preload("res://scripts/aba_loja.gd")
 const FazendaTela := preload("res://scripts/fazenda_tela.gd")
+const Fluxo := preload("res://scripts/fluxo.gd")
 
 var batalha: Control
 var estado := Estado.new()
@@ -56,6 +57,10 @@ func _ready() -> void:
 	abas = _cria_painel_abas()
 	abas.tab_changed.connect(_troca_aba)
 	raiz.add_child(abas)
+
+	var fluxo := Fluxo.new()    # menus, pausa, tutorial e fim da v1 (nao age nos modos de teste)
+	fluxo.main = self
+	add_child(fluxo)
 
 	if "--teste-batalha" in OS.get_cmdline_user_args():
 		_roda_teste()

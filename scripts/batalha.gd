@@ -21,6 +21,7 @@ var tempo_chefe := 0.0
 var descanso := 0.0           # > 0: heroi derrotado, descansando
 var derrotas := 0
 var vitoria_final := false
+var endgame := false          # true depois de continuar jogando apos o chefe final
 
 var _fundo: ColorRect
 var _chao: ColorRect
@@ -300,11 +301,22 @@ func _avanca_fase() -> void:
 	if fase < Cfg.FASES_TOTAL:
 		fase += 1
 		_fundo.color = Color(0.22, 0.16, 0.28) if fase >= Cfg.ZONA2_A_PARTIR_DA_FASE else Color(0.16, 0.22, 0.28)
-	else:
+	elif not endgame:
 		vitoria_final = true
 		_painel_derrota.visible = true
 		_texto_derrota.text = "Vitória! Você derrotou o chefe da fase %d.\n(Fim da zona 1. Continue fortalecendo o herói!)" % fase
 	heroi.cura(heroi.vida_max)
+
+# Chamado pelo fluxo (tela de fim da v1) quando o jogador escolhe continuar jogando:
+# a luta volta e o chefe da ultima fase se repete, sem nova tela de vitoria
+func continua_apos_vitoria() -> void:
+	endgame = true
+	vitoria_final = false
+	_painel_derrota.visible = false
+	abates = 0
+	respawn = 0.0
+	_novo_inimigo()
+	_atualiza_hud()
 
 func _derrota(motivo: String) -> void:
 	derrotas += 1

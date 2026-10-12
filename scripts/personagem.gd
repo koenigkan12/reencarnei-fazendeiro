@@ -234,6 +234,12 @@ func habilidade_por_id(id: String) -> Dictionary:
 	return {}
 
 # ---------- salvar ----------
+func para_dicionario() -> Dictionary:
+	return para_dict()
+
+func de_dicionario(d: Dictionary) -> void:
+	de_dict(d)
+
 func para_dict() -> Dictionary:
 	return {"atributos": atributos.duplicate(), "talentos": talentos.duplicate(), "hab_niveis": hab_niveis.duplicate(), "hab_slots": hab_slots.duplicate()}
 
