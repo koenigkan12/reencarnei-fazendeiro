@@ -22,6 +22,7 @@ var abas: TabContainer
 var fazenda: Control
 var _voltar: Button       # botao "voltar a fazenda" mostrado sobre a batalha
 var _vendo_batalha := false
+var fluxo
 
 func _ready() -> void:
 	var raiz := VBoxContainer.new()
@@ -62,12 +63,14 @@ func _ready() -> void:
 
 	estado.batalha = batalha     # o salvamento precisa da fase da batalha
 	estado.voltou_offline.connect(func(resumo: Dictionary): Salvamento.mostra_resumo(self, resumo))
-	var fluxo := Fluxo.new()    # menus, pausa, tutorial e fim da v1 (nao age nos modos de teste)
+	fluxo = Fluxo.new()    # menus, pausa, tutorial e fim da v1 (nao age nos modos de teste)
 	fluxo.main = self
 	add_child(fluxo)
 
 	if "--teste-batalha" in OS.get_cmdline_user_args():
 		_roda_teste()
+	if "--teste-fluxo" in OS.get_cmdline_user_args():
+		_roda_teste_fluxo()
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--captura="):
 			_captura(arg.substr(10))
@@ -127,6 +130,21 @@ func _captura(caminho: String) -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--aba="):
 			abas.current_tab = int(arg.substr(6))
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--acao="):    # abre uma tela do fluxo antes da captura: tutorial, fim, pausa, opcoes
+			await get_tree().create_timer(0.5).timeout
+			match arg.substr(7):
+				"tutorial": fluxo._novo_jogo()
+				"fim":
+					fluxo._novo_jogo()
+					fluxo._fecha_tutorial()
+					fluxo._mostra_fim()
+				"pausa":
+					fluxo._novo_jogo()
+					fluxo._fecha_tutorial()
+					fluxo._abre_pausa()
+				"opcoes":
+					fluxo._abre_opcoes()
 	Engine.time_scale = 6.0
 	await get_tree().create_timer(12.0).timeout
 	if "--demo-fazenda" in OS.get_cmdline_user_args():
@@ -136,6 +154,43 @@ func _captura(caminho: String) -> void:
 	var img := get_viewport().get_texture().get_image()
 	img.save_png(caminho)
 	get_tree().quit()
+
+# Jogada completa: menu -> novo jogo -> tutorial -> pausa -> jogo (bot) -> chefe final -> tela de fim -> continuar.
+# Roda com o Fluxo ativo (nao pula menus):
+#   godot --headless --path . --quit-after 99999 -- --teste-fluxo
+func _roda_teste_fluxo() -> void:
+	var falhas := 0
+	var checa := func(nome: String, ok: bool) -> void:
+		print("[fluxo] %s: %s" % ["ok" if ok else "FALHOU", nome])
+		if not ok:
+			falhas += 1
+	await get_tree().create_timer(0.5).timeout
+	checa.call("abre no menu principal", fluxo._modo == "menu")
+	fluxo._novo_jogo()
+	await get_tree().create_timer(0.5).timeout
+	checa.call("novo jogo abre o tutorial", fluxo._modo == "tutorial")
+	fluxo._fecha_tutorial()
+	checa.call("tutorial fechado volta ao jogo", fluxo._modo == "jogo" and not get_tree().paused)
+	fluxo._abre_pausa()
+	checa.call("pausa abre e pausa a arvore", fluxo._modo == "pausa" and get_tree().paused)
+	fluxo._fecha_pausa()
+	checa.call("pausa fecha", fluxo._modo == "jogo" and not get_tree().paused)
+	Engine.time_scale = 20.0
+	var passos := 0
+	while not batalha.vitoria_final and passos < 360:     # ate 30 min de jogo
+		await get_tree().create_timer(5.0).timeout
+		_bot()
+		passos += 1
+	checa.call("bot chegou a vitoria no chefe final (fase %d, %d min)" % [batalha.fase, passos * 5 / 60], batalha.vitoria_final)
+	await get_tree().create_timer(1.0).timeout
+	checa.call("tela de fim apareceu", fluxo._modo == "fim" and get_tree().paused)
+	Engine.time_scale = 1.0
+	fluxo._continua_apos_fim()
+	await get_tree().create_timer(1.0).timeout
+	checa.call("continuar jogando depois do fim", fluxo._modo == "jogo" and not get_tree().paused)
+	checa.call("save existe depois do fim", estado.existe_save())
+	print("[fluxo] %s" % ("TUDO CERTO" if falhas == 0 else "%d FALHA(S)" % falhas))
+	get_tree().quit(1 if falhas > 0 else 0)
 
 # Teste headless: godot --headless --path . --quit-after 99999 -- --teste-batalha
 # Simula 30 minutos de jogo em ~90s reais com um "jogador" automatico (compra, planta, rega, colhe,
