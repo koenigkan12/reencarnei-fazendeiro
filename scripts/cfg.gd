@@ -99,7 +99,7 @@ const HABILIDADES := [
 
 # ================= FASES / INIMIGOS =================
 const FASES_TOTAL := 20
-const INIMIGOS_POR_FASE := 10
+const INIMIGOS_POR_FASE := 15
 const ESCALA_VIDA := 1.25             # multiplicador por fase
 const ESCALA_DANO := 1.18
 const ESCALA_OURO := 1.2
@@ -119,8 +119,8 @@ const INIMIGOS_ZONA2 := [
 ]
 # Chefes (fase%10 == 5 mini boss; fase%10 == 0 boss). Baseados no 3o inimigo da zona.
 const CHEFES := {
-	"mini": {"nome": "Mini Boss", "cor": Color(0.75, 0.3, 0.75), "tamanho": Vector2(90, 120), "vida_mult": 5.0, "dano_mult": 1.5, "ouro_mult": 5.0, "xp_mult": 5.0, "tempo": 30.0},
-	"boss": {"nome": "BOSS", "cor": Color(0.85, 0.15, 0.2), "tamanho": Vector2(120, 150), "vida_mult": 12.0, "dano_mult": 2.0, "ouro_mult": 12.0, "xp_mult": 12.0, "tempo": 45.0},
+	"mini": {"nome": "Mini Boss", "cor": Color(0.75, 0.3, 0.75), "tamanho": Vector2(90, 120), "vida_mult": 4.8, "dano_mult": 1.5, "ouro_mult": 5.0, "xp_mult": 5.0, "tempo": 32.0},
+	"boss": {"nome": "BOSS", "cor": Color(0.85, 0.15, 0.2), "tamanho": Vector2(120, 150), "vida_mult": 10.5, "dano_mult": 2.0, "ouro_mult": 12.0, "xp_mult": 12.0, "tempo": 50.0},
 }
 
 # ================= EQUIPAMENTO =================
@@ -234,7 +234,7 @@ const AUDIO_NOMES := {
 # Tutorial de primeira vez. "aba" = aba que o tutorial abre naquele passo ("" = nenhuma).
 const TUTORIAL := [
 	{"titulo": "Bem-vindo, Chico!", "aba": "", "texto": "Você morreu, reencarnou num mundo de fantasia e ganhou a habilidade mais inútil possível: Cultivo.\nVamos ver como o jogo funciona em poucos passos."},
-	{"titulo": "A batalha é automática", "aba": "Personagem", "texto": "O herói luta sozinho. Cada inimigo derrotado dá ouro, XP e drops.\nA cada 10 inimigos você avança de fase. Chefes têm tempo limite: se o relógio zerar ou o herói cair, ele descansa e você volta mais forte."},
+	{"titulo": "A batalha é automática", "aba": "Personagem", "texto": "O herói luta sozinho. Cada inimigo derrotado dá ouro, XP e drops.\nA cada 15 inimigos você avança de fase. Chefes têm tempo limite: se o relógio zerar ou o herói cair, ele descansa e você volta mais forte."},
 	{"titulo": "Personagem", "aba": "Personagem", "texto": "Atributos: compre com ouro (ataque, vida, defesa...).\nTalentos: 1 ponto por nível. Alguns nós liberam habilidades.\nHabilidades: equipe até 4. Elas disparam sozinhas, da esquerda para a direita, quando a recarga acaba. O estilo (físico, mágico ou à distância) vem do que você equipa."},
 	{"titulo": "Equipamento", "aba": "Equipamento", "texto": "Drops vão para a mochila. Toque num item para ver o CP que ele daria e escolha Equipar ou Vender.\nArma do mesmo estilo da habilidade dá mais dano.\nMelhore itens com +N usando ouro e minério."},
 	{"titulo": "Fazenda", "aba": "Fazenda", "texto": "Escolha a ferramenta (teclas 1 a 6): enxada para arar, semente para plantar, regador para regar, mão para colher, picareta para quebrar rochas (dão minério).\nColher sobe o Cultivo e rende comida e dinheiro. A batalha continua por trás."},
