@@ -15,6 +15,9 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 | `scripts/fazenda.gd` | Terreno, ferramentas, sementes, crescimento (regado), colheita, rochas, Cultivo. |
 | `scripts/loja.gd` | Compras: sementes, ferramentas, irrigacao. |
 | `scripts/comida.gd` | Pratos, estoque, 3 slots do heroi, buffs. |
+| `scripts/salvamento.gd` | Salvar/carregar tudo (JSON em user://save.json, com .bak), ganho offline e ligacoes com a interface. |
+| `scripts/autosave.gd` | No que salva a cada 30 s, ao fechar a janela e ao perder o foco. |
+| `scripts/tela_offline.gd` | Tela "Bem-vindo de volta" com o resumo do ganho offline. |
 
 ## Batalha e interface
 | Script | O que e |
@@ -45,3 +48,12 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 - Depois de mudar algo, o sistema chama `e.notifica()`; a UI le no sinal `estado.mudou` (1x por quadro).
 - `assets/` fica fora do git (pack de arte com licenca propria).
 - Testar: `godot --headless --path . --quit-after 99999 -- --teste-batalha` (bot joga 30 min simulados).
+
+## Salvamento (para o menu principal / main.gd)
+- `Salvamento.existe_save() -> bool`, `Salvamento.apagar()` (novo jogo).
+- `Salvamento.salvar(estado, batalha) -> bool`. Cada sistema guarda o seu em `para_dict()` / `de_dict(d)`.
+- `Salvamento.carregar(estado, batalha) -> Dictionary`: chame DEPOIS que a batalha estiver na arvore (`_ready` feito). Devolve `{}` se nao ha save; senao `{"offline": resumo}` (ja aplicado ao estado).
+- `Salvamento.mostra_resumo(pai, resumo)`: abre a tela de ganho offline por cima de `pai` (nao faz nada se `resumo` for vazio).
+- `Salvamento.instala_autosave(pai, estado, batalha) -> Node`: instala o autosave; o no tem `ativo` (false enquanto nao ha jogo em andamento).
+- Ganho offline: taxa de ouro/XP medida em janela deslizante, `OFFLINE_EFICIENCIA` (50%) e limite `OFFLINE_HORAS_MAX` (8 h) em `cfg.gd`; a fazenda e a comida avancam o tempo todo.
+- Teste: `godot --headless --path . --script res://scripts/teste_salvamento.gd` (codigo de saida 0 = tudo certo).

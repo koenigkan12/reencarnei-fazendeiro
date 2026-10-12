@@ -15,6 +15,8 @@ var ouro := 0.0
 var nivel := 1
 var xp := 0.0
 var minerio := 0
+var ganho_ouro_total := 0.0   # soma do ouro/XP vindo do combate (antes dos bonus); salvamento.gd mede a taxa do ganho offline
+var ganho_xp_total := 0.0
 
 var personagem
 var equipamento
@@ -40,6 +42,8 @@ func xp_para_subir() -> float:
 
 # devolve true se subiu de nivel
 func ganha(ouro_ganho: float, xp_ganho: float) -> bool:
+	ganho_ouro_total += ouro_ganho
+	ganho_xp_total += xp_ganho
 	ouro += ouro_ganho * (1.0 + personagem.talento("ouro_pct"))
 	xp += xp_ganho * (1.0 + personagem.talento("xp_pct"))
 	var subiu := false

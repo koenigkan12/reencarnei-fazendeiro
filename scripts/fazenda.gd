@@ -200,19 +200,32 @@ func _nasce_rocha() -> void:
 	if rochas < Cfg.ROCHA_MAX and not livres.is_empty():
 		livres[randi() % livres.size()]["t"] = 2
 
-# ---------- Save (o save global chama estes dois) ----------
-func para_dicionario() -> Dictionary:
+# ---------- Salvar ----------
+func para_dict() -> Dictionary:
 	return {"terreno": terreno.duplicate(true), "sementes": sementes.duplicate(), "colheita": colheita.duplicate(),
 		"cultivo_nivel": cultivo_nivel, "cultivo_xp": cultivo_xp, "semente_selecionada": semente_selecionada,
 		"ferramentas": ferramentas.duplicate(), "irrigacao": irrigacao}
 
-func de_dicionario(d: Dictionary) -> void:
-	terreno = d.get("terreno", terreno)
-	sementes = d.get("sementes", sementes)
-	colheita = d.get("colheita", colheita)
-	cultivo_nivel = d.get("cultivo_nivel", cultivo_nivel)
-	cultivo_xp = d.get("cultivo_xp", cultivo_xp)
-	semente_selecionada = d.get("semente_selecionada", semente_selecionada)
-	ferramentas = d.get("ferramentas", ferramentas)
-	irrigacao = d.get("irrigacao", irrigacao)
+# JSON devolve numeros como float: converte os inteiros de volta
+func de_dict(d: Dictionary) -> void:
+	var t: Array = d.get("terreno", [])
+	if t.size() == terreno.size():
+		for i in t.size():
+			var src: Dictionary = t[i]
+			terreno[i] = {"t": int(src.get("t", 0)), "cultura": int(src.get("cultura", -1)),
+				"prog": float(src.get("prog", 0.0)), "agua": float(src.get("agua", 0.0))}
+	_copia_ints(d.get("sementes", []), sementes)
+	_copia_ints(d.get("colheita", []), colheita)
+	cultivo_nivel = maxi(int(d.get("cultivo_nivel", 1)), 1)
+	cultivo_xp = float(d.get("cultivo_xp", 0.0))
+	semente_selecionada = clampi(int(d.get("semente_selecionada", 0)), 0, Cfg.CULTURAS.size() - 1)
+	var f: Dictionary = d.get("ferramentas", {})
+	for k in ferramentas.keys():
+		if f.has(k):
+			ferramentas[k] = maxi(int(f[k]), 1)
+	irrigacao = maxi(int(d.get("irrigacao", 0)), 0)
 	e.notifica()
+
+func _copia_ints(origem: Array, destino: Array) -> void:
+	for i in mini(origem.size(), destino.size()):
+		destino[i] = int(origem[i])

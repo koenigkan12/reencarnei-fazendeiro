@@ -51,11 +51,17 @@ func tick(delta: float) -> void:
 	if mudaram:
 		e.notifica()
 
-# ---------- Save ----------
-func para_dicionario() -> Dictionary:
+# ---------- Salvar ----------
+func para_dict() -> Dictionary:
 	return {"pratos": pratos.duplicate(), "slots": slots_comida.duplicate(true)}
 
-func de_dicionario(d: Dictionary) -> void:
-	pratos = d.get("pratos", pratos)
-	slots_comida = d.get("slots", slots_comida)
+func de_dict(d: Dictionary) -> void:
+	var p: Array = d.get("pratos", [])
+	for i in mini(p.size(), pratos.size()):
+		pratos[i] = int(p[i])
+	var sl: Array = d.get("slots", [])
+	for i in mini(sl.size(), slots_comida.size()):
+		var src: Dictionary = sl[i]
+		var prato := int(src.get("prato", -1))
+		slots_comida[i] = {"prato": prato if prato < Cfg.PRATOS.size() else -1, "restante": float(src.get("restante", 0.0))}
 	e.notifica()
