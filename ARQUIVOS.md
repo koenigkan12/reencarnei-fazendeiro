@@ -34,12 +34,12 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 | `scripts/fluxo.gd` | Fluxo do jogo (camada por cima de tudo): menu principal, pausa com Esc, opcoes, tutorial de primeira vez e tela de fim da v1. Pausa a arvore enquanto uma tela esta aberta; nao age em `--teste-batalha` nem `--captura`. |
 | `scripts/menu_principal.gd`, `menu_pausa.gd`, `tela_opcoes.gd`, `tutorial.gd`, `tela_fim.gd` | As telas do fluxo. Textos do tutorial, resolucoes e nomes de audio ficam em `cfg.gd`. |
 | `scripts/opcoes.gd` | Opcoes do jogador em `user://opcoes.cfg` (volumes, tela cheia, resolucao, tutorial visto, tempo jogado). |
-| `scripts/audio.gd` | Gancho de audio: toca `res://assets/audio/<nome>.ogg/.mp3/.wav` se existir (`Audio.toca_musica`, `Audio.toca_efeito`); nomes em `Cfg.AUDIO_NOMES`. |
+| `scripts/audio.gd` | Audio: toca `res://audio/<nome>.wav/.ogg/.mp3` se existir (`Audio.toca_musica`, `Audio.toca_efeito`); nomes em `Cfg.AUDIO_NOMES`. Chamado pela batalha, skills, fazenda, loja e `main.gd` (musica por tela). |
 | `scripts/menu_util.gd` | Pecas de UI dos menus. |
 
 ## Ganchos do fluxo
 - **Save:** o fluxo chama em `main.estado`, se existirem: `existe_save() -> bool`, `salva() -> bool`, `carrega() -> bool`, `apaga_save()`. Sem eles, "Continuar" fica desabilitado. Autosave a cada `Cfg.AUTOSAVE_SEGUNDOS`. `personagem` e `equipamento` tem `para_dicionario()`/`de_dicionario(d)` como a fazenda.
-- **Audio:** colocar os arquivos em `assets/audio/` com os nomes de `Cfg.AUDIO_NOMES`.
+- **Audio:** os arquivos ficam em `audio/` com os nomes de `Cfg.AUDIO_NOMES`. Os atuais sao sinteticos, gerados por `tools/gera_audio.py` (sem licenca externa; rode `python tools/gera_audio.py` para regenerar).
 - **Fim da v1:** o fluxo detecta `batalha.vitoria_final`; "Continuar jogando" chama `batalha.continua_apos_vitoria()`.
 
 ## Convencoes
@@ -54,3 +54,15 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 - Autosave a cada `AUTOSAVE_SEGUNDOS` (60 s) e ao sair/voltar ao menu e' feito pelo `fluxo.gd`.
 - Ganho offline: taxa de ouro/XP medida em janela deslizante, `OFFLINE_EFICIENCIA` (50%) e limite `OFFLINE_HORAS_MAX` (8 h) em `cfg.gd`; a fazenda e a comida avancam o tempo todo.
 - Teste: `godot --headless --path . --script res://scripts/teste_salvamento.gd` (codigo de saida 0 = tudo certo).
+
+## Testes e ferramentas
+| Comando / arquivo | Para que serve |
+|---|---|
+| `godot --headless --path . --quit-after 99999 -- --teste-batalha` | Bot joga ate 30 min simulados e imprime o estado por minuto (termina em `VITORIA FINAL`). Codigo do bot: `_bot()` em `main.gd`. |
+| `godot --headless --path . --quit-after 99999 -- --teste-fluxo` | Jogada completa: menu, novo jogo, tutorial, pausa, bot ate o chefe 20, tela de fim, continuar. Termina em `TUDO CERTO`. |
+| `godot --headless --path . --script res://scripts/teste_salvamento.gd` | Ida e volta do save e do ganho offline (saida 0 = certo). |
+| `godot --headless --path . --script res://scripts/teste_balanceamento.gd -- --seeds=5 --bot-intervalo=5 --max-min=120` | Simulacao de balanceamento (varias sementes; intervalo 5 = jogador perfeito, 30 = "humano"). Resultados guardados na branch `balanceamento-baseline`, pasta `testes/balanceamento/`. |
+| `godot --path . -- --captura=arquivo.png [--aba=N] [--acao=tutorial\|fim\|pausa\|opcoes]` | Screenshot do jogo (com janela; pula menus). `--tela=arquivo.png` faz o mesmo SEM pular o menu principal. |
+| `tools/gera_audio.py` | Gera os efeitos e musicas sinteticos em `audio/`. |
+
+Os testes gravam `user://save.json` e `user://opcoes.cfg` (em `%APPDATA%\Godotpp_userdata\Reencarnei Fazendeiro`): apague os dois depois de testar, senao o primeiro jogo real pula o tutorial e carrega um save de teste. Faca merges e testes numa worktree separada, nunca na pasta aberta no editor.
