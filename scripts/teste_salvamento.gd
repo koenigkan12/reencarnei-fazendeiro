@@ -42,6 +42,8 @@ func _initialize() -> void:
 	e1.fazenda.irrigacao = 1
 	e1.comida.pratos[1] = 4
 	e1.comida.slots_comida[0] = {"prato": 2, "restante": 33.0}
+	e1.comida.slots_comida[1] = {"prato": -1, "restante": 0.0}     # slots vazios: o offline nao gasta o estoque de pratos
+	e1.comida.slots_comida[2] = {"prato": -1, "restante": 0.0}
 	b1.fase = 12
 	b1.abates = 4
 	b1.derrotas = 2
