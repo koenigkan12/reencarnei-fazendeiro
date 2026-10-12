@@ -35,7 +35,7 @@ func _ready() -> void:
 		col.add_child(h)
 		_linhas.append({"sel": sel, "info": info, "vende": vende})
 	var dica := Label.new()
-	dica.text = "Compre sementes na Loja. Sementes também\ncaem dos inimigos."
+	dica.text = "Compre sementes na Loja.\nRegue uma vez; a planta cresce sozinha."
 	dica.modulate = Color(1, 1, 1, 0.6)
 	col.add_child(dica)
 

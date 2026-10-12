@@ -200,3 +200,13 @@ const PRATOS := [
 	{"nome": "Ensopado", "efeito": "vida", "valor": 0.30, "duracao": 90.0, "desc": "+30% vida"},
 	{"nome": "Torta", "efeito": "dano", "valor": 0.40, "duracao": 90.0, "desc": "+40% ataque"},
 ]
+
+# ---- Fazenda: ajustes de 12/10 (rega unica, sementes so na Loja, acoes dao XP de Cultivo) ----
+const SEMENTE_DROP_ATIVO := false     # sementes agora so na Loja (decisao do Vncs); true volta o drop dos inimigos
+const CULTIVO_XP_ARAR := 0.5          # XP de Cultivo por lote arado
+const CULTIVO_XP_REGAR := 0.5         # XP de Cultivo por lote regado
+const IRRIGACAO_VEL_POR_NIVEL := 0.10 # +10% de velocidade de crescimento por nivel de Irrigacao
+const IRRIGACAO_AUTOREGA_NIVEL := 2   # a partir daqui a planta ja nasce regada (nao precisa do regador)
+# Nivel de Cultivo minimo para subir cada ferramenta (indice 0: nivel 1->2, indice 1: 2->3)
+const FERRAMENTA_CULTIVO_MIN := {"enxada": [3, 6], "regador": [2, 5], "picareta": [4, 7]}
+const FLASH_SEGUNDOS := 0.3           # brilho curto no lote quando uma acao acontece (placeholder da animacao)

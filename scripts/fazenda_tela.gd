@@ -11,6 +11,7 @@ var _cabecalho: Label
 var _barra: ProgressBar
 var _info: Label
 var _sel: Label
+var _botoes: Array = []
 
 func _ready() -> void:
 	color = Color(0.2, 0.34, 0.2)
@@ -49,14 +50,15 @@ func _ready() -> void:
 	ferr.add_theme_constant_override("separation", 6)
 	col.add_child(ferr)
 	var grupo := ButtonGroup.new()
-	var lista := [["mao", "✋ Colher"], ["enxada", "Enxada"], ["regador", "Regador"], ["picareta", "Picareta"], ["semente", "Semente"]]
+	var lista := [["auto", "Auto"], ["mao", "✋ Colher"], ["enxada", "Enxada"], ["regador", "Regador"], ["picareta", "Picareta"], ["semente", "Semente"]]
 	for par in lista:
 		var b := Button.new()
 		b.text = par[1]
 		b.toggle_mode = true
 		b.button_group = grupo
 		b.custom_minimum_size = Vector2(110, 30)
-		b.button_pressed = (par[0] == "mao")
+		b.button_pressed = (par[0] == "auto")
+		_botoes.append(b)
 		var id: String = par[0]
 		b.pressed.connect(func(): _escolhe(id))
 		ferr.add_child(b)
@@ -72,6 +74,16 @@ func _ready() -> void:
 func _escolhe(id: String) -> void:
 	_mapa.ferramenta = id
 
+# Atalhos 1 a 6 escolhem a ferramenta (so com a tela da fazenda aberta)
+func _unhandled_key_input(evento: InputEvent) -> void:
+	var ev := evento as InputEventKey
+	if ev == null or not is_visible_in_tree() or not ev.pressed or ev.echo:
+		return
+	var i: int = ev.keycode - KEY_1
+	if i >= 0 and i < _botoes.size():
+		_botoes[i].button_pressed = true
+		_escolhe(["auto", "mao", "enxada", "regador", "picareta", "semente"][i])
+
 func _process(_delta: float) -> void:
 	if not is_visible_in_tree():
 		return
@@ -80,4 +92,4 @@ func _process(_delta: float) -> void:
 	_barra.value = estado.fazenda.cultivo_xp
 	_info.text = "Minério: %d    Ouro: %d" % [estado.minerio, floori(estado.ouro)]
 	var c: Dictionary = Cfg.CULTURAS[estado.fazenda.semente_selecionada]
-	_sel.text = "Semente: %s (%d)   |   Dica: ara com a Enxada, planta, rega — a planta só cresce molhada" % [c["nome"], estado.fazenda.sementes[estado.fazenda.semente_selecionada]]
+	_sel.text = "Semente: %s (%d)   |   Auto: ara, planta, rega (1 vez) e colhe com um clique. Atalhos 1 a 6" % [c["nome"], estado.fazenda.sementes[estado.fazenda.semente_selecionada]]

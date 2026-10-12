@@ -20,6 +20,7 @@ entre si pelo `Estado` (variavel `e` dentro de cada sistema).
 | Script | O que e |
 |---|---|
 | `scripts/batalha.gd` | Area de batalha: heroi vs inimigos, chefes, derrota/descanso, HUD, habilidades automaticas. |
+| `scripts/arte.gd` | Carrega a arte do pack (assets/cute_fantasy/, fora do git), monta animacoes e recortes; sem a pasta, tudo cai nos placeholders coloridos. |
 | `scripts/unidade.gd` | Combatente (retangulo colorido + barra de vida), placeholder da arte. |
 | `scripts/main.gd` | Raiz da UI: tela de cima (batalha/fazenda), painel de abas, teste headless (`-- --teste-batalha`). |
 | `scripts/aba_personagem.gd` | Aba Personagem (atributos, habilidades, talentos). |

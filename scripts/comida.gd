@@ -50,3 +50,12 @@ func tick(delta: float) -> void:
 			mudaram = true
 	if mudaram:
 		e.notifica()
+
+# ---------- Save ----------
+func para_dicionario() -> Dictionary:
+	return {"pratos": pratos.duplicate(), "slots": slots_comida.duplicate(true)}
+
+func de_dicionario(d: Dictionary) -> void:
+	pratos = d.get("pratos", pratos)
+	slots_comida = d.get("slots", slots_comida)
+	e.notifica()

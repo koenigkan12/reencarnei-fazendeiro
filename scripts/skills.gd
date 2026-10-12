@@ -128,7 +128,7 @@ func _nome(h: Dictionary) -> void:
 	l.add_theme_color_override("font_color", Cfg.ESTILOS[h["estilo"]]["cor"])
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 6)
-	l.position = b.heroi.position + Vector2(-70, -b.heroi.get_child(0).size.y - 90)
+	l.position = b.heroi.position + Vector2(-70, -b.heroi.altura - 90)
 	b.add_child(l)
 	var t := b.create_tween().set_parallel(true)
 	t.tween_property(l, "position:y", l.position.y - 30, 1.0)
@@ -136,7 +136,7 @@ func _nome(h: Dictionary) -> void:
 	t.chain().tween_callback(l.queue_free)
 
 func _centro(u: Control) -> Vector2:
-	return u.position + Vector2(0, -u.get_child(0).size.y / 2.0)
+	return u.position + Vector2(0, -u.altura / 2.0)
 
 func _pisca(u: Control, cor: Color) -> void:
 	u.modulate = cor
