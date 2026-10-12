@@ -14,7 +14,7 @@ func _init(estado) -> void:
 	sementes[0] = 3
 
 # terreno: Cfg.LINHAS x Cfg.COLUNAS (indice = y * COLUNAS + x)
-# t: 0 grama, 1 terra, 2 rocha ; cultura -1 vazio ; prog = segundos regados de crescimento ; agua = segundos de agua restante
+# t: 0 grama, 1 terra, 2 rocha ; cultura -1 vazio ; prog = segundos de crescimento ; agua > 0 = regado (rega unica: dura ate a planta ficar pronta)
 var terreno: Array = []
 var sementes: Array = [0, 0, 0]
 var colheita: Array = [0, 0, 0]
@@ -40,8 +40,34 @@ func cultivo_xp_para_subir() -> float:
 func cultura_liberada(i: int) -> bool:
 	return cultivo_nivel >= Cfg.CULTURAS[i]["nivel"]
 
-func agua_segundos() -> float:
+func agua_segundos() -> float:   # legado (rega agora dura ate ficar pronto); mantido por compatibilidade
 	return Cfg.AGUA_SEGUNDOS + irrigacao * Cfg.AGUA_POR_IRRIGACAO
+
+func autorega() -> bool:
+	return irrigacao >= Cfg.IRRIGACAO_AUTOREGA_NIVEL
+
+func _ganha_cultivo(xp: float) -> void:
+	cultivo_xp += xp
+	while cultivo_xp >= cultivo_xp_para_subir():
+		cultivo_xp -= cultivo_xp_para_subir()
+		cultivo_nivel += 1
+
+# Acao do modo Auto no lote: rocha->picareta, grama->enxada, terra vazia->semente, pronto->colher, seco->regador
+func acao_automatica(x: int, y: int) -> String:
+	if not lote_aberto(x, y):
+		return ""
+	var l := lote(x, y)
+	if l["t"] == 2:
+		return "picareta"
+	if l["t"] == 0:
+		return "enxada"
+	if l["cultura"] == -1:
+		return "semente" if sementes[semente_selecionada] > 0 else ""
+	if lote_pronto(x, y):
+		return "mao"
+	if l["agua"] <= 0.0:
+		return "regador"
+	return ""
 
 func lote_pronto(x: int, y: int) -> bool:
 	var l := lote(x, y)
@@ -49,6 +75,11 @@ func lote_pronto(x: int, y: int) -> bool:
 
 # Aplica a ferramenta no lote (x, y); a area depende do nivel da ferramenta.
 func usa_ferramenta(nome: String, x: int, y: int) -> void:
+	if nome == "auto":
+		var a := acao_automatica(x, y)
+		if a != "":
+			usa_ferramenta(a, x, y)
+		return
 	var raio := 0
 	if ferramentas.has(nome):
 		raio = ferramentas[nome] - 1
@@ -68,10 +99,13 @@ func _aplica(nome: String, x: int, y: int) -> bool:
 		"enxada":
 			if l["t"] == 0:
 				l["t"] = 1
+				_ganha_cultivo(Cfg.CULTIVO_XP_ARAR)
 				return true
 		"regador":
-			if l["t"] == 1:
-				l["agua"] = agua_segundos()
+			# rega unica: so faz sentido em planta seca que ainda nao esta pronta
+			if l["t"] == 1 and l["cultura"] != -1 and l["agua"] <= 0.0 and not lote_pronto(x, y):
+				l["agua"] = 1.0
+				_ganha_cultivo(Cfg.CULTIVO_XP_REGAR)
 				return true
 		"picareta":
 			if l["t"] == 2:
@@ -83,6 +117,7 @@ func _aplica(nome: String, x: int, y: int) -> bool:
 				sementes[semente_selecionada] -= 1
 				l["cultura"] = semente_selecionada
 				l["prog"] = 0.0
+				l["agua"] = 1.0 if autorega() else 0.0
 				return true
 		"mao":
 			return _colhe(x, y)
@@ -96,17 +131,17 @@ func _colhe(x: int, y: int) -> bool:
 	colheita[c] += roundi(Cfg.RENDIMENTO * (1.0 + e.personagem.talento("colheita_pct")))
 	l["cultura"] = -1
 	l["prog"] = 0.0
-	cultivo_xp += Cfg.CULTURAS[c]["xp"]
-	while cultivo_xp >= cultivo_xp_para_subir():
-		cultivo_xp -= cultivo_xp_para_subir()
-		cultivo_nivel += 1
+	_ganha_cultivo(Cfg.CULTURAS[c]["xp"])
 	if cultivo_nivel >= Cfg.AUTOPLANTIO_NIVEL and sementes[c] > 0:
 		sementes[c] -= 1       # replantio automatico
 		l["cultura"] = c
+		l["agua"] = 1.0 if autorega() else 0.0
 	return true
 
-# Tenta fazer a semente cair de um inimigo (so das culturas que o Cultivo ja libera)
+# Drop de semente dos inimigos: desligado por padrao (sementes vem da Loja). Ver Cfg.SEMENTE_DROP_ATIVO.
 func tenta_semente(chefe: bool) -> void:
+	if not Cfg.SEMENTE_DROP_ATIVO:
+		return
 	if not chefe and randf() > Cfg.SEMENTE_CHANCE:
 		return
 	var total := 0.0
@@ -132,14 +167,14 @@ func vende_colheita(cultura: int) -> void:
 
 # Chamado todo quadro (a fazenda cresce mesmo com outra aba aberta)
 func tick(delta: float) -> void:
-	var vel: float = 1.0 + cultivo_nivel * Cfg.CULTIVO_CRESCIMENTO_POR_NIVEL + e.personagem.talento("crescimento_pct")
+	var vel: float = 1.0 + cultivo_nivel * Cfg.CULTIVO_CRESCIMENTO_POR_NIVEL + irrigacao * Cfg.IRRIGACAO_VEL_POR_NIVEL + e.personagem.talento("crescimento_pct")
 	for y in Cfg.LINHAS:
 		for x in colunas_abertas():
 			var l := lote(x, y)
-			if l["agua"] > 0.0:
-				l["agua"] = maxf(l["agua"] - delta, 0.0)
-				if l["cultura"] != -1:
-					l["prog"] += delta * vel
+			if l["agua"] > 0.0 and l["cultura"] != -1:
+				l["prog"] += delta * vel
+				if l["prog"] >= Cfg.CULTURAS[l["cultura"]]["tempo"]:
+					l["agua"] = 0.0     # rega unica acabou: pronto para colher
 	_timer_rocha += delta
 	if _timer_rocha >= Cfg.ROCHA_RESPAWN_SEGUNDOS:
 		_timer_rocha = 0.0
@@ -158,3 +193,19 @@ func _nasce_rocha() -> void:
 	if rochas < Cfg.ROCHA_MAX and not livres.is_empty():
 		livres[randi() % livres.size()]["t"] = 2
 
+# ---------- Save (o save global chama estes dois) ----------
+func para_dicionario() -> Dictionary:
+	return {"terreno": terreno.duplicate(true), "sementes": sementes.duplicate(), "colheita": colheita.duplicate(),
+		"cultivo_nivel": cultivo_nivel, "cultivo_xp": cultivo_xp, "semente_selecionada": semente_selecionada,
+		"ferramentas": ferramentas.duplicate(), "irrigacao": irrigacao}
+
+func de_dicionario(d: Dictionary) -> void:
+	terreno = d.get("terreno", terreno)
+	sementes = d.get("sementes", sementes)
+	colheita = d.get("colheita", colheita)
+	cultivo_nivel = d.get("cultivo_nivel", cultivo_nivel)
+	cultivo_xp = d.get("cultivo_xp", cultivo_xp)
+	semente_selecionada = d.get("semente_selecionada", semente_selecionada)
+	ferramentas = d.get("ferramentas", ferramentas)
+	irrigacao = d.get("irrigacao", irrigacao)
+	e.notifica()

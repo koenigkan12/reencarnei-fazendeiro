@@ -4,7 +4,7 @@ extends Control
 const Cfg := preload("res://scripts/cfg.gd")
 
 var estado
-var ferramenta := "mao"
+var ferramenta := "auto"
 var _hover := Vector2i(-1, -1)
 
 func _ready() -> void:
@@ -77,8 +77,11 @@ func _draw() -> void:
 			draw_rect(r, Color(0, 0, 0, 0.25), false, 1.0)
 	# destaque da area da ferramenta
 	if estado.fazenda.lote_aberto(_hover.x, _hover.y):
+		var nome := ferramenta
+		if nome == "auto":
+			nome = estado.fazenda.acao_automatica(_hover.x, _hover.y)
 		var raio := 0
-		if estado.fazenda.ferramentas.has(ferramenta):
-			raio = estado.fazenda.ferramentas[ferramenta] - 1
+		if estado.fazenda.ferramentas.has(nome):
+			raio = estado.fazenda.ferramentas[nome] - 1
 		var ra := Rect2(o + Vector2(_hover.x - raio, _hover.y - raio) * t, Vector2(t, t) * (2 * raio + 1))
 		draw_rect(ra, Color(1, 1, 1, 0.9), false, 2.0)

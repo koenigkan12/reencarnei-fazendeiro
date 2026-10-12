@@ -6,6 +6,7 @@ var estado
 var _sem: Array = []    # por cultura: {rotulo, b1, b5}
 var _ferr: Array = []   # por ferramenta: {rotulo, botao}
 var _irr: Dictionary
+var _vende: Button
 
 func _ready() -> void:
 	add_theme_constant_override("separation", 6)
@@ -54,6 +55,10 @@ func _ready() -> void:
 	bt2.pressed.connect(func(): estado.loja.melhora_irrigacao())
 	grade.add_child(bt2)
 	_irr = {"rotulo": rot2, "botao": bt2}
+	_vende = Button.new()
+	_vende.custom_minimum_size = Vector2(260, 30)
+	_vende.pressed.connect(func(): estado.loja.vende_tudo())
+	add_child(_vende)
 	estado.mudou.connect(_atualiza)
 	_atualiza()
 
@@ -64,7 +69,7 @@ func _atualiza() -> void:
 		var lib: bool = estado.fazenda.cultura_liberada(i)
 		var p: int = floori(c["semente"])
 		if lib:
-			l["rotulo"].text = "Semente de %s  (%d ouro cada, cresce em %d s regada)  você tem: %d" % [c["nome"], p, roundi(c["tempo"]), estado.fazenda.sementes[i]]
+			l["rotulo"].text = "Semente de %s  (%d ouro cada, cresce em %d s depois de regar)  você tem: %d" % [c["nome"], p, roundi(c["tempo"]), estado.fazenda.sementes[i]]
 		else:
 			l["rotulo"].text = "Semente de %s  (libera no Cultivo nível %d)" % [c["nome"], c["nivel"]]
 		l["b1"].text = "Comprar 1: %d" % p
@@ -82,7 +87,7 @@ func _atualiza() -> void:
 		else:
 			l["botao"].text = "Melhorar: %d" % c
 			l["botao"].disabled = estado.ouro < c
-	_irr["rotulo"].text = "Irrigação  nível %d  (lote regado fica úmido %d s)" % [estado.fazenda.irrigacao, roundi(estado.fazenda.agua_segundos())]
+	_irr["rotulo"].text = "Irrigação  nível %d  (+%d%% crescimento%s)" % [estado.fazenda.irrigacao, roundi(estado.fazenda.irrigacao * Cfg.IRRIGACAO_VEL_POR_NIVEL * 100.0), ", planta já nasce regada" if estado.fazenda.autorega() else "; nível %d: nasce regada" % Cfg.IRRIGACAO_AUTOREGA_NIVEL]
 	var ci: int = estado.loja.custo_irrigacao()
 	if ci < 0:
 		_irr["botao"].text = "MÁXIMO"
@@ -90,3 +95,6 @@ func _atualiza() -> void:
 	else:
 		_irr["botao"].text = "Melhorar: %d" % ci
 		_irr["botao"].disabled = estado.ouro < ci
+	var vt: int = estado.loja.valor_colheita()
+	_vende.text = "Vender toda a colheita: +%d ouro" % vt
+	_vende.disabled = vt <= 0

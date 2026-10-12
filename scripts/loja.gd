@@ -44,3 +44,13 @@ func melhora_irrigacao() -> bool:
 	e.notifica()
 	return true
 
+# Valor total da colheita em estoque e venda de tudo de uma vez (aba Loja)
+func valor_colheita() -> int:
+	var v := 0.0
+	for i in Cfg.CULTURAS.size():
+		v += e.fazenda.colheita[i] * Cfg.CULTURAS[i]["preco"]
+	return floori(v)
+
+func vende_tudo() -> void:
+	for i in Cfg.CULTURAS.size():
+		e.fazenda.vende_colheita(i)
