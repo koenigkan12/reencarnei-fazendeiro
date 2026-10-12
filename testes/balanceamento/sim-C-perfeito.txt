@@ -1,0 +1,110 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[bal] #1 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #1 min 0.7: fase 2  nivel 4  CP 139  derrotas 0
+[bal] #1 min 1.1: fase 3  nivel 6  CP 206  derrotas 0
+[bal] #1 min 1.6: fase 4  nivel 7  CP 246  derrotas 0
+[bal] #1 min 1.9: fase 5  nivel 8  CP 287  derrotas 0
+[bal] #1 min 2.5: fase 6  nivel 10  CP 348  derrotas 0
+[bal] #1 min 2.9: fase 7  nivel 10  CP 461  derrotas 0
+[bal] #1 min 3.3: fase 8  nivel 11  CP 524  derrotas 0
+[bal] #1 min 3.8: fase 9  nivel 11  CP 568  derrotas 0
+[bal] #1 min 4.2: fase 10  nivel 12  CP 631  derrotas 0
+[bal] #1 min 5.0: fase 11  nivel 13  CP 804  derrotas 0
+[bal] #1 min 5.7: fase 12  nivel 14  CP 1105  derrotas 0
+[bal] #1 min 6.3: fase 13  nivel 14  CP 1149  derrotas 0
+[bal] #1 min 6.9: fase 14  nivel 15  CP 1558  derrotas 0
+[bal] #1 min 7.6: fase 15  nivel 16  CP 1664  derrotas 0
+[bal] #1 min 8.4: fase 16  nivel 16  CP 1910  derrotas 0
+[bal] #1 min 9.3: fase 17  nivel 17  CP 1960  derrotas 0
+[bal] #1 min 10.2: fase 18  nivel 17  CP 2094  derrotas 0
+[bal] #1 min 11.1: fase 19  nivel 18  CP 2721  derrotas 0
+[bal] #1 min 12.0: fase 20  nivel 18  CP 3015  derrotas 0
+[bal] #1 VITORIA em 13.3 min de jogo, 0 derrotas, nivel 19, CP 4868
+[bal] #2 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #2 min 0.7: fase 2  nivel 4  CP 141  derrotas 0
+[bal] #2 min 1.1: fase 3  nivel 6  CP 212  derrotas 0
+[bal] #2 min 1.6: fase 4  nivel 7  CP 251  derrotas 0
+[bal] #2 min 2.0: fase 5  nivel 8  CP 290  derrotas 0
+[bal] #2 min 2.5: fase 6  nivel 10  CP 369  derrotas 0
+[bal] #2 min 3.0: fase 7  nivel 10  CP 425  derrotas 0
+[bal] #2 min 3.4: fase 8  nivel 11  CP 468  derrotas 0
+[bal] #2 min 3.9: fase 9  nivel 11  CP 483  derrotas 0
+[bal] #2 min 4.4: fase 10  nivel 12  CP 626  derrotas 0
+[bal] #2 min 5.2: fase 11  nivel 13  CP 677  derrotas 0
+[bal] #2 min 5.9: fase 12  nivel 14  CP 752  derrotas 0
+[bal] #2 min 6.7: fase 13  nivel 14  CP 809  derrotas 0
+[bal] #2 min 7.4: fase 14  nivel 15  CP 887  derrotas 0
+[bal] #2 min 8.3: fase 15  nivel 15  CP 932  derrotas 0
+[bal] #2 min 9.8: fase 16  nivel 16  CP 1057  derrotas 0
+[bal] #2 min 10.8: fase 17  nivel 17  CP 1112  derrotas 0
+[bal] #2 min 12.1: fase 18  nivel 17  CP 1198  derrotas 0
+[bal] #2 min 13.6: fase 19  nivel 18  CP 1621  derrotas 0
+[bal] #2 min 14.6: fase 20  nivel 18  CP 2599  derrotas 0
+[bal] #2 min 16.6: DERROTA na fase 20 (chefe) (tempo esgotado). heroi: vida 2823 ataque 325 intervalo 0.78 CP 2666 | inimigo: vida 58286 dano 510 intervalo 1.70
+[bal] #2 VITORIA em 18.0 min de jogo, 1 derrotas, nivel 19, CP 4468
+[bal] #3 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #3 min 0.7: fase 2  nivel 4  CP 143  derrotas 0
+[bal] #3 min 1.2: fase 3  nivel 6  CP 213  derrotas 0
+[bal] #3 min 1.6: fase 4  nivel 7  CP 262  derrotas 0
+[bal] #3 min 1.9: fase 5  nivel 8  CP 346  derrotas 0
+[bal] #3 min 2.4: fase 6  nivel 10  CP 403  derrotas 0
+[bal] #3 min 2.8: fase 7  nivel 10  CP 423  derrotas 0
+[bal] #3 min 3.3: fase 8  nivel 11  CP 466  derrotas 0
+[bal] #3 min 3.8: fase 9  nivel 11  CP 481  derrotas 0
+[bal] #3 min 4.3: fase 10  nivel 12  CP 557  derrotas 0
+[bal] #3 min 5.2: fase 11  nivel 13  CP 751  derrotas 0
+[bal] #3 min 5.9: fase 12  nivel 14  CP 880  derrotas 0
+[bal] #3 min 6.8: fase 13  nivel 14  CP 918  derrotas 0
+[bal] #3 min 7.5: fase 14  nivel 15  CP 1105  derrotas 0
+[bal] #3 min 8.4: fase 15  nivel 15  CP 1594  derrotas 0
+[bal] #3 min 9.6: fase 16  nivel 16  CP 1812  derrotas 0
+[bal] #3 min 10.5: fase 17  nivel 17  CP 1838  derrotas 0
+[bal] #3 min 11.5: fase 18  nivel 17  CP 1942  derrotas 0
+[bal] #3 min 12.5: fase 19  nivel 18  CP 2429  derrotas 0
+[bal] #3 min 13.7: fase 20  nivel 18  CP 2462  derrotas 0
+[bal] #3 VITORIA em 15.7 min de jogo, 0 derrotas, nivel 19, CP 4135
+[bal] #4 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #4 min 0.7: fase 2  nivel 4  CP 104  derrotas 0
+[bal] #4 min 1.1: fase 3  nivel 6  CP 186  derrotas 0
+[bal] #4 min 1.6: fase 4  nivel 7  CP 316  derrotas 0
+[bal] #4 min 1.9: fase 5  nivel 8  CP 360  derrotas 0
+[bal] #4 min 2.4: fase 6  nivel 9  CP 408  derrotas 0
+[bal] #4 min 2.8: fase 7  nivel 10  CP 445  derrotas 0
+[bal] #4 min 3.3: fase 8  nivel 11  CP 487  derrotas 0
+[bal] #4 min 3.7: fase 9  nivel 11  CP 736  derrotas 0
+[bal] #4 min 4.1: fase 10  nivel 12  CP 814  derrotas 0
+[bal] #4 min 4.8: fase 11  nivel 13  CP 1027  derrotas 0
+[bal] #4 min 5.5: fase 12  nivel 14  CP 1167  derrotas 0
+[bal] #4 min 6.2: fase 13  nivel 14  CP 1270  derrotas 0
+[bal] #4 min 6.8: fase 14  nivel 15  CP 1455  derrotas 0
+[bal] #4 min 7.4: fase 15  nivel 16  CP 1550  derrotas 0
+[bal] #4 min 8.4: fase 16  nivel 16  CP 1719  derrotas 0
+[bal] #4 min 9.2: fase 17  nivel 17  CP 1811  derrotas 0
+[bal] #4 min 10.1: fase 18  nivel 17  CP 1880  derrotas 0
+[bal] #4 min 10.9: fase 19  nivel 18  CP 2704  derrotas 0
+[bal] #4 min 11.6: fase 20  nivel 18  CP 3893  derrotas 0
+[bal] #4 VITORIA em 13.2 min de jogo, 0 derrotas, nivel 19, CP 5731
+[bal] #5 min 0.0: fase 1  nivel 1  CP 40  derrotas 0
+[bal] #5 min 0.8: fase 2  nivel 4  CP 132  derrotas 0
+[bal] #5 min 1.2: fase 3  nivel 6  CP 180  derrotas 0
+[bal] #5 min 1.6: fase 4  nivel 7  CP 240  derrotas 0
+[bal] #5 min 2.1: fase 5  nivel 8  CP 286  derrotas 0
+[bal] #5 min 2.5: fase 6  nivel 9  CP 355  derrotas 0
+[bal] #5 min 3.0: fase 7  nivel 10  CP 402  derrotas 0
+[bal] #5 min 3.5: fase 8  nivel 11  CP 456  derrotas 0
+[bal] #5 min 4.0: fase 9  nivel 11  CP 497  derrotas 0
+[bal] #5 min 4.5: fase 10  nivel 12  CP 558  derrotas 0
+[bal] #5 min 5.4: fase 11  nivel 13  CP 695  derrotas 0
+[bal] #5 min 6.2: fase 12  nivel 14  CP 772  derrotas 0
+[bal] #5 min 7.0: fase 13  nivel 14  CP 822  derrotas 0
+[bal] #5 min 7.9: fase 14  nivel 15  CP 1025  derrotas 0
+[bal] #5 min 8.9: fase 15  nivel 15  CP 1367  derrotas 0
+[bal] #5 min 10.3: fase 16  nivel 16  CP 1622  derrotas 0
+[bal] #5 min 11.4: fase 17  nivel 17  CP 1876  derrotas 0
+[bal] #5 min 12.3: fase 18  nivel 17  CP 1903  derrotas 0
+[bal] #5 min 13.4: fase 19  nivel 18  CP 1950  derrotas 0
+[bal] #5 min 14.3: fase 20  nivel 18  CP 3271  derrotas 0
+[bal] #5 VITORIA em 15.8 min de jogo, 0 derrotas, nivel 19, CP 6746
+[bal] resumo: 5/5 partidas chegaram ao fim. minutos para vencer: [13.2, 13.3, 15.7, 15.8, 18.0]
+[bal] derrotas por fase (somando as partidas): { 20: 1 }
