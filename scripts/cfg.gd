@@ -119,8 +119,8 @@ const INIMIGOS_ZONA2 := [
 ]
 # Chefes (fase%10 == 5 mini boss; fase%10 == 0 boss). Baseados no 3o inimigo da zona.
 const CHEFES := {
-	"mini": {"nome": "Mini Boss", "cor": Color(0.75, 0.3, 0.75), "tamanho": Vector2(90, 120), "vida_mult": 5.0, "dano_mult": 1.5, "ouro_mult": 5.0, "xp_mult": 5.0, "tempo": 30.0},
-	"boss": {"nome": "BOSS", "cor": Color(0.85, 0.15, 0.2), "tamanho": Vector2(120, 150), "vida_mult": 12.0, "dano_mult": 2.0, "ouro_mult": 12.0, "xp_mult": 12.0, "tempo": 45.0},
+	"mini": {"nome": "Mini Boss", "cor": Color(0.75, 0.3, 0.75), "tamanho": Vector2(90, 120), "vida_mult": 4.5, "dano_mult": 1.5, "ouro_mult": 5.0, "xp_mult": 5.0, "tempo": 35.0},
+	"boss": {"nome": "BOSS", "cor": Color(0.85, 0.15, 0.2), "tamanho": Vector2(120, 150), "vida_mult": 9.0, "dano_mult": 2.0, "ouro_mult": 12.0, "xp_mult": 12.0, "tempo": 55.0},
 }
 
 # ================= EQUIPAMENTO =================
