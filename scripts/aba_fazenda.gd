@@ -1,11 +1,10 @@
 extends HBoxContainer
-# Aba Fazenda (painel de baixo): sementes, colheita e venda do excedente.
+# Aba Fazenda (painel de baixo): escolher semente, vender colheita, cozinhar e slots de comida.
 const Cfg := preload("res://scripts/cfg.gd")
 
 var estado
 var _linhas: Array = []   # por cultura: {sel, info, vende}
 var _cozinha: Array = []  # por prato: {rotulo, botao}
-var _slots: Array = []    # OptionButtons dos slots de comida
 
 func _ready() -> void:
 	add_theme_constant_override("separation", 30)
@@ -13,7 +12,7 @@ func _ready() -> void:
 	col.add_theme_constant_override("separation", 8)
 	add_child(col)
 	var tit := Label.new()
-	tit.text = "Sementes e colheita  (escolha a semente e clique nos lotes)"
+	tit.text = "Semente do plantio e colheita"
 	col.add_child(tit)
 	var grupo := ButtonGroup.new()
 	for i in Cfg.CULTURAS.size():
@@ -27,37 +26,31 @@ func _ready() -> void:
 		sel.pressed.connect(func(): estado.semente_selecionada = i)
 		h.add_child(sel)
 		var info := Label.new()
-		info.custom_minimum_size = Vector2(190, 0)
+		info.custom_minimum_size = Vector2(110, 0)
 		h.add_child(info)
 		var vende := Button.new()
-		vende.custom_minimum_size = Vector2(170, 32)
+		vende.custom_minimum_size = Vector2(150, 32)
 		vende.pressed.connect(func(): estado.vende_colheita(i))
 		h.add_child(vende)
 		col.add_child(h)
 		_linhas.append({"sel": sel, "info": info, "vende": vende})
-	var h2 := HBoxContainer.new()
-	h2.add_theme_constant_override("separation", 12)
-	var todos := Button.new()
-	todos.text = "Plantar em todos os lotes vazios"
-	todos.pressed.connect(func(): estado.planta_em_todos(estado.semente_selecionada))
-	h2.add_child(todos)
-	var colher := Button.new()
-	colher.text = "Colher tudo"
-	colher.pressed.connect(func(): estado.colhe_tudo())
-	h2.add_child(colher)
-	col.add_child(h2)
+	var dica := Label.new()
+	dica.text = "Compre sementes na Loja. Sementes também\ncaem dos inimigos."
+	dica.modulate = Color(1, 1, 1, 0.6)
+	col.add_child(dica)
+
 	add_child(VSeparator.new())
 	var col2 := VBoxContainer.new()
 	col2.add_theme_constant_override("separation", 8)
 	add_child(col2)
 	var t2 := Label.new()
-	t2.text = "Cozinha (gasta colheita: cada prato dura um tempo)"
+	t2.text = "Cozinha (gasta colheita; cada prato dura um tempo)"
 	col2.add_child(t2)
 	for i in Cfg.PRATOS.size():
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 12)
 		var rot := Label.new()
-		rot.custom_minimum_size = Vector2(250, 0)
+		rot.custom_minimum_size = Vector2(270, 0)
 		h.add_child(rot)
 		var bt := Button.new()
 		bt.custom_minimum_size = Vector2(190, 32)
@@ -78,9 +71,8 @@ func _ready() -> void:
 		for p in Cfg.PRATOS:
 			ob.add_item(p["nome"])
 		ob.select(estado.slots_comida[s]["prato"] + 1)
-		ob.item_selected.connect(func(idx: int): estado.define_slot(s, idx - 1))
+		ob.item_selected.connect(func(idx: int): estado.define_slot_comida(s, idx - 1))
 		hs.add_child(ob)
-		_slots.append(ob)
 	estado.mudou.connect(_atualiza)
 	_atualiza()
 

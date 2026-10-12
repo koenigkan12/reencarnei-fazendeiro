@@ -30,6 +30,11 @@ var _barra_chefe: ProgressBar
 var _aviso: Label
 var _msg_drop: Label
 var _hud_comida: Label
+var _caixas_hab: Array = []   # [{painel, rotulo}]
+var cd_hab := {}                # id -> segundos restantes
+var gcd := 0.0
+var furia_restante := 0.0
+var escudo_restante := 0.0
 var _painel_derrota: PanelContainer
 var _texto_derrota: Label
 
@@ -45,7 +50,7 @@ func _ready() -> void:
 
 	heroi = Unidade.new()
 	add_child(heroi)
-	heroi.configura("Herói", Color(0.3, 0.5, 0.95), Vector2(50, 90), estado.vida_max(), estado.dano(), estado.intervalo())
+	heroi.configura("Herói", Color(0.3, 0.5, 0.95), Vector2(50, 90), estado.vida_max(), estado.ataque(), estado.intervalo())
 	inimigo = Unidade.new()
 	add_child(inimigo)
 	_novo_inimigo()
@@ -93,6 +98,14 @@ func _cria_hud() -> void:
 	add_child(_aviso)
 	_hud_comida = Label.new()
 	add_child(_hud_comida)
+	for i in Cfg.SLOTS_HABILIDADE:
+		var p := PanelContainer.new()
+		var l := Label.new()
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.custom_minimum_size = Vector2(110, 40)
+		p.add_child(l)
+		add_child(p)
+		_caixas_hab.append({"painel": p, "rotulo": l})
 	_msg_drop = Label.new()
 	_msg_drop.add_theme_font_size_override("font_size", 18)
 	_msg_drop.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -137,6 +150,8 @@ func _posiciona() -> void:
 	_aviso.size = Vector2(size.x, 60)
 	_msg_drop.position = Vector2(16, 70)
 	_hud_comida.position = Vector2(16, size.y - 34)
+	for i in _caixas_hab.size():
+		_caixas_hab[i]["painel"].position = Vector2(size.x - 16 - (_caixas_hab.size() - i) * 122, size.y - 62)
 	_painel_derrota.position = Vector2(size.x / 2.0 - 190, size.y * 0.3)
 	_painel_derrota.size = Vector2(380, 150)
 
@@ -194,6 +209,7 @@ func _process(delta: float) -> void:
 	if vitoria_final:
 		return
 	heroi.cura(heroi.vida_max * estado.regen_pct() * delta)
+	_tick_habilidades(delta)
 	if contra_chefe:
 		tempo_chefe -= delta
 		_barra_chefe.max_value = Cfg.CHEFES[chefe_tipo]["tempo"]
@@ -222,14 +238,96 @@ func _process(delta: float) -> void:
 
 func _ataca(atacante: Control, alvo: Control, direcao: float) -> void:
 	atacante.animacao_ataque(direcao)
-	alvo.recebe_dano(atacante.dano)
-	_numero_de_dano(alvo, atacante.dano, atacante == inimigo)
+	if atacante == heroi:
+		var dano: float = atacante.dano * (1.0 + _furia_valor())
+		var crit: bool = randf() < estado.crit_chance()
+		if crit:
+			dano *= estado.crit_mult()
+		alvo.recebe_dano(dano)
+		_numero_de_dano(alvo, dano, false, crit)
+	else:
+		var dano2: float = atacante.dano * estado.reducao_dano()
+		if escudo_restante > 0.0:
+			dano2 *= 1.0 - _escudo_valor()
+		alvo.recebe_dano(dano2)
+		_numero_de_dano(alvo, dano2, true, false)
 
-func _numero_de_dano(alvo: Control, valor: float, no_heroi: bool) -> void:
+func _furia_valor() -> float:
+	return Cfg.HABILIDADES[3]["valor"] * estado.fator_habilidade("furia") if furia_restante > 0.0 else 0.0
+
+func _escudo_valor() -> float:
+	return minf(Cfg.HABILIDADES[4]["valor"] * estado.fator_habilidade("escudo"), 0.9)
+
+# Habilidades automaticas: a cada GCD usa a primeira pronta da esquerda para a direita
+func _tick_habilidades(delta: float) -> void:
+	furia_restante = maxf(furia_restante - delta, 0.0)
+	escudo_restante = maxf(escudo_restante - delta, 0.0)
+	for id in cd_hab.keys():
+		cd_hab[id] = maxf(cd_hab[id] - delta, 0.0)
+	gcd -= delta
+	if gcd > 0.0 or not inimigo.vivo or not heroi.vivo:
+		return
+	for id in estado.hab_slots:
+		if id == "" or cd_hab.get(id, 0.0) > 0.0:
+			continue
+		var h: Dictionary = estado.habilidade_por_id(id)
+		if h["tipo"] == "cura" and heroi.vida > heroi.vida_max * 0.85:
+			continue
+		if h["tipo"] == "buff_dano" and furia_restante > 0.0:
+			continue
+		if h["tipo"] == "escudo" and escudo_restante > 0.0:
+			continue
+		_usa_habilidade(h)
+		cd_hab[id] = h["cd"]
+		gcd = Cfg.GCD_HABILIDADE
+		return
+
+func _usa_habilidade(h: Dictionary) -> void:
+	var f: float = estado.fator_habilidade(h["id"])
+	_nome_habilidade(h["nome"])
+	match h["tipo"]:
+		"dano":
+			heroi.animacao_ataque(1.0)
+			for g in h["golpes"]:
+				var dano: float = heroi.dano * (1.0 + _furia_valor()) * h["mult"] * f
+				var crit: bool = randf() < estado.crit_chance()
+				if crit:
+					dano *= estado.crit_mult()
+				inimigo.recebe_dano(dano)
+				_numero_de_dano(inimigo, dano, false, crit)
+				if not inimigo.vivo:
+					_inimigo_morreu()
+					return
+		"cura":
+			var quanto: float = heroi.vida_max * h["valor"] * f
+			heroi.cura(quanto)
+			_numero_de_dano(heroi, quanto, false, false, Color(0.4, 1.0, 0.5))
+		"buff_dano":
+			furia_restante = h["duracao"]
+		"escudo":
+			escudo_restante = h["duracao"]
+
+func _nome_habilidade(nome: String) -> void:
 	var l := Label.new()
-	l.text = str(roundi(valor))
-	l.add_theme_font_size_override("font_size", 24)
-	l.add_theme_color_override("font_color", Color(1, 0.35, 0.35) if no_heroi else Color(1, 0.95, 0.5))
+	l.text = nome + "!"
+	l.add_theme_font_size_override("font_size", 26)
+	l.add_theme_color_override("font_color", Color(0.6, 0.9, 1.0))
+	l.add_theme_color_override("font_outline_color", Color.BLACK)
+	l.add_theme_constant_override("outline_size", 6)
+	l.position = heroi.position + Vector2(-70, -heroi.get_child(0).size.y - 90)
+	add_child(l)
+	var t := create_tween().set_parallel(true)
+	t.tween_property(l, "position:y", l.position.y - 30, 1.0)
+	t.tween_property(l, "modulate:a", 0.0, 1.0).set_delay(0.4)
+	t.chain().tween_callback(l.queue_free)
+func _numero_de_dano(alvo: Control, valor: float, no_heroi: bool, crit: bool, cor: Color = Color(0, 0, 0, 0)) -> void:
+	var l := Label.new()
+	l.text = ("%d!" if crit else "%d") % roundi(valor)
+	l.add_theme_font_size_override("font_size", 34 if crit else 24)
+	var c := Color(1, 0.35, 0.35) if no_heroi else (Color(1, 0.6, 0.15) if crit else Color(1, 0.95, 0.5))
+	if cor.a > 0.0:
+		c = cor
+	l.add_theme_color_override("font_color", c)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 4)
 	l.position = alvo.position + Vector2(randf_range(-20, 20), -alvo.get_child(0).size.y - 50)
@@ -238,7 +336,6 @@ func _numero_de_dano(alvo: Control, valor: float, no_heroi: bool) -> void:
 	t.tween_property(l, "position:y", l.position.y - 50, 0.7)
 	t.tween_property(l, "modulate:a", 0.0, 0.7)
 	t.chain().tween_callback(l.queue_free)
-
 func _inimigo_morreu() -> void:
 	inimigo.visible = false
 	respawn = Cfg.RESPAWN_SEGUNDOS
@@ -286,6 +383,8 @@ func _derrota(motivo: String) -> void:
 	_atualiza_hud()
 
 func _levanta() -> void:
+	furia_restante = 0.0
+	escudo_restante = 0.0
 	heroi.modulate = Color.WHITE
 	heroi.vivo = true
 	heroi.vida = heroi.vida_max
@@ -299,7 +398,7 @@ func _sincroniza() -> void:
 	var razao: float = heroi.vida / heroi.vida_max
 	heroi.vida_max = estado.vida_max()
 	heroi.vida = minf(razao * heroi.vida_max + 0.0, heroi.vida_max)
-	heroi.dano = estado.dano()
+	heroi.dano = estado.ataque()
 	heroi.intervalo = estado.intervalo()
 	heroi.atualiza_barra()
 	_atualiza_hud()
@@ -327,6 +426,15 @@ func _atualiza_hud() -> void:
 	_barra_fase.value = abates
 
 func _atualiza_comida() -> void:
+	for i in _caixas_hab.size():
+		var id: String = estado.hab_slots[i]
+		var l: Label = _caixas_hab[i]["rotulo"]
+		if id == "":
+			l.text = "(vazio)"
+		else:
+			var h: Dictionary = estado.habilidade_por_id(id)
+			var cd: float = cd_hab.get(id, 0.0)
+			l.text = h["nome"] + ("\npronto" if cd <= 0.0 else "\n%.1f s" % cd)
 	var partes: Array = []
 	for sl in estado.slots_comida:
 		if sl["prato"] == -1:

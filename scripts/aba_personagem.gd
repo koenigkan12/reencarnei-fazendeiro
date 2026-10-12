@@ -1,38 +1,192 @@
 extends VBoxContainer
-# Aba Personagem: status do heroi e upgrades comprados com ouro.
+# Aba Personagem: status, atributos (ouro), habilidades automaticas e talentos.
 const Cfg := preload("res://scripts/cfg.gd")
 
 var estado
 var _status: Label
-var _linhas: Array = []   # [{rotulo, botao}]
+var _attr: Array = []      # [{rotulo, botao}]
+var _hab_rot: Array = []   # [{rotulo, botao}]
+var _slots: Array = []     # OptionButtons
+var _pontos: Label
+var _tal: Array = []       # [{rotulo, botao}]
+var _reset: Button
+var _chave_slots := ""
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 10)
+	add_theme_constant_override("separation", 4)
 	_status = Label.new()
-	_status.add_theme_font_size_override("font_size", 18)
+	_status.add_theme_font_size_override("font_size", 16)
 	add_child(_status)
-	for i in Cfg.UPGRADES.size():
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 16)
-		var rot := Label.new()
-		rot.custom_minimum_size = Vector2(380, 0)
-		h.add_child(rot)
-		var bt := Button.new()
-		bt.custom_minimum_size = Vector2(180, 36)
-		bt.pressed.connect(func(): estado.compra_upgrade(i))
-		h.add_child(bt)
-		add_child(h)
-		_linhas.append({"rotulo": rot, "botao": bt})
+	var sub := TabContainer.new()
+	sub.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	add_child(sub)
+	sub.add_child(_monta_atributos())
+	sub.add_child(_monta_habilidades())
+	sub.add_child(_monta_talentos())
 	estado.mudou.connect(_atualiza)
 	_atualiza()
 
+func _linha(grade: GridContainer, largura_rotulo: int, largura_botao: int, texto_botao: String = "") -> Dictionary:
+	var rot := Label.new()
+	rot.custom_minimum_size = Vector2(largura_rotulo, 0)
+	grade.add_child(rot)
+	var bt := Button.new()
+	bt.custom_minimum_size = Vector2(largura_botao, 30)
+	grade.add_child(bt)
+	return {"rotulo": rot, "botao": bt}
+
+func _monta_atributos() -> Control:
+	var grade := GridContainer.new()
+	grade.name = "Atributos"
+	grade.columns = 4
+	grade.add_theme_constant_override("h_separation", 14)
+	grade.add_theme_constant_override("v_separation", 6)
+	for i in Cfg.ATRIBUTOS.size():
+		var l := _linha(grade, 300, 150)
+		l["botao"].pressed.connect(func(): estado.compra_atributo(i))
+		_attr.append(l)
+	return grade
+
+func _monta_habilidades() -> Control:
+	var v := VBoxContainer.new()
+	v.name = "Habilidades"
+	v.add_theme_constant_override("separation", 6)
+	var topo := HBoxContainer.new()
+	topo.add_theme_constant_override("separation", 8)
+	var t := Label.new()
+	t.text = "Ordem de uso (esquerda → direita):"
+	topo.add_child(t)
+	for s in Cfg.SLOTS_HABILIDADE:
+		var ob := OptionButton.new()
+		ob.custom_minimum_size = Vector2(170, 30)
+		ob.item_selected.connect(func(idx: int): estado.define_slot_habilidade(s, ob.get_item_metadata(idx)))
+		topo.add_child(ob)
+		_slots.append(ob)
+	v.add_child(topo)
+	var grade := GridContainer.new()
+	grade.columns = 4
+	grade.add_theme_constant_override("h_separation", 14)
+	grade.add_theme_constant_override("v_separation", 6)
+	v.add_child(grade)
+	for i in Cfg.HABILIDADES.size():
+		var l := _linha(grade, 300, 150)
+		l["botao"].pressed.connect(func(): estado.sobe_habilidade(i))
+		_hab_rot.append(l)
+	return v
+
+func _monta_talentos() -> Control:
+	var v := VBoxContainer.new()
+	v.name = "Talentos"
+	v.add_theme_constant_override("separation", 6)
+	var topo := HBoxContainer.new()
+	topo.add_theme_constant_override("separation", 20)
+	_pontos = Label.new()
+	topo.add_child(_pontos)
+	_reset = Button.new()
+	_reset.pressed.connect(func(): estado.reseta_talentos())
+	topo.add_child(_reset)
+	v.add_child(topo)
+	var ramos := HBoxContainer.new()
+	ramos.add_theme_constant_override("separation", 30)
+	v.add_child(ramos)
+	var colunas := {}
+	for t in Cfg.TALENTOS:
+		if not colunas.has(t["ramo"]):
+			var c := VBoxContainer.new()
+			c.add_theme_constant_override("separation", 4)
+			var tit := Label.new()
+			tit.text = "— %s —" % t["ramo"]
+			c.add_child(tit)
+			ramos.add_child(c)
+			colunas[t["ramo"]] = c
+	for i in Cfg.TALENTOS.size():
+		var t: Dictionary = Cfg.TALENTOS[i]
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 8)
+		var rot := Label.new()
+		rot.custom_minimum_size = Vector2(300, 0)
+		h.add_child(rot)
+		var bt := Button.new()
+		bt.text = "+"
+		bt.custom_minimum_size = Vector2(36, 28)
+		bt.pressed.connect(func(): estado.sobe_talento(i))
+		h.add_child(bt)
+		colunas[t["ramo"]].add_child(h)
+		_tal.append({"rotulo": rot, "botao": bt})
+	return v
+
 func _atualiza() -> void:
-	_status.text = "Nível %d   |   Vida %d   Dano %d   Regeneração %.1f%%/s   |   CP %d" % [
-		estado.nivel, roundi(estado.vida_max()), roundi(estado.dano()), estado.regen_pct() * 100.0, estado.cp()]
-	for i in Cfg.UPGRADES.size():
-		var u: Dictionary = Cfg.UPGRADES[i]
-		var l: Dictionary = _linhas[i]
-		l["rotulo"].text = "%s  Nv %d   (%s por nível)" % [u["nome"], estado.upgrades[u["id"]], u["desc"]]
-		var c: int = estado.custo_upgrade(i)
-		l["botao"].text = "Comprar: %d ouro" % c
-		l["botao"].disabled = estado.ouro < c
+	_status.text = "Nível %d   |   Vida %d   Ataque %d   Defesa %d   Crítico %d%% (x%.2f)   Vel. %.2f/s   Regen %.1f%%/s   |   CP %d" % [
+		estado.nivel, roundi(estado.vida_max()), roundi(estado.ataque()), roundi(estado.defesa()),
+		roundi(estado.crit_chance() * 100.0), estado.crit_mult(), 1.0 / estado.intervalo(), estado.regen_pct() * 100.0, estado.cp()]
+	for i in Cfg.ATRIBUTOS.size():
+		var a: Dictionary = Cfg.ATRIBUTOS[i]
+		var l: Dictionary = _attr[i]
+		l["rotulo"].text = "%s  Nv %d   (%s)" % [a["nome"], estado.atributos[a["id"]], a["desc"]]
+		if estado.atributo_no_maximo(i):
+			l["botao"].text = "MÁXIMO"
+			l["botao"].disabled = true
+		else:
+			var c: int = estado.custo_atributo(i)
+			l["botao"].text = "Comprar: %d" % c
+			l["botao"].disabled = estado.ouro < c
+	# habilidades
+	var chave := str(estado.nivel >= 0) + str(estado.hab_slots) + str(_liberadas())
+	if chave != _chave_slots:
+		_chave_slots = chave
+		_reconstroi_slots()
+	_atualiza_resto()
+
+func _liberadas() -> int:
+	var n := 0
+	for i in Cfg.HABILIDADES.size():
+		if estado.habilidade_liberada(i):
+			n += 1
+	return n
+
+func _reconstroi_slots() -> void:
+	for k in _slots.size():
+		var ob: OptionButton = _slots[k]
+		ob.clear()
+		ob.add_item("(vazio)")
+		ob.set_item_metadata(0, "")
+		var sel := 0
+		for i in Cfg.HABILIDADES.size():
+			if estado.habilidade_liberada(i):
+				ob.add_item(Cfg.HABILIDADES[i]["nome"])
+				ob.set_item_metadata(ob.item_count - 1, Cfg.HABILIDADES[i]["id"])
+				if estado.hab_slots[k] == Cfg.HABILIDADES[i]["id"]:
+					sel = ob.item_count - 1
+		ob.select(sel)
+
+func _atualiza_resto() -> void:
+	for i in Cfg.HABILIDADES.size():
+		var h: Dictionary = Cfg.HABILIDADES[i]
+		var l: Dictionary = _hab_rot[i]
+		if estado.habilidade_liberada(i):
+			l["rotulo"].text = "%s  Nv %d  (%s, recarga %d s)" % [h["nome"], estado.hab_niveis[h["id"]], h["desc"], roundi(h["cd"])]
+			var c: int = estado.custo_habilidade(i)
+			l["botao"].text = "Melhorar: %d" % c
+			l["botao"].disabled = estado.ouro < c
+		else:
+			l["rotulo"].text = "%s  (libera no nível %d)" % [h["nome"], h["nivel"]]
+			l["botao"].text = "Bloqueada"
+			l["botao"].disabled = true
+	# talentos
+	_pontos.text = "Pontos de talento: %d  (1 por nível)" % estado.pontos_talento()
+	_reset.text = "Resetar talentos (%d ouro)" % estado.custo_reset_talentos()
+	_reset.disabled = estado.pontos_talento_gastos() == 0 or estado.ouro < estado.custo_reset_talentos()
+	for i in Cfg.TALENTOS.size():
+		var t: Dictionary = Cfg.TALENTOS[i]
+		var l: Dictionary = _tal[i]
+		var req := ""
+		if t["req"] != "" and estado.talentos[t["req"]] == 0:
+			req = "  [requer %s]" % _nome_talento(t["req"])
+		l["rotulo"].text = "%s %d/%d  (%s)%s" % [t["nome"], estado.talentos[t["id"]], t["max"], t["desc"], req]
+		l["botao"].disabled = not estado.pode_talento(i)
+
+func _nome_talento(id: String) -> String:
+	for t in Cfg.TALENTOS:
+		if t["id"] == id:
+			return t["nome"]
+	return id
