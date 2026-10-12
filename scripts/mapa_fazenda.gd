@@ -8,6 +8,12 @@ var estado
 var ferramenta := "auto"
 var _hover := Vector2i(-1, -1)
 var _flashes: Array = []     # [{x, y, cor, t}] brilho curto por acao (placeholder da animacao de arar/regar)
+var _heroi_y := 3.5          # linha (em lotes) onde o heroi esta parado, ao lado do terreno
+var _heroi_ferr := ""        # ferramenta da animacao em andamento
+var _heroi_t := 0.0          # segundos restantes da animacao
+var _relogio := 0.0
+const ANIM_LINHA := {"picareta": 0, "enxada": 3, "regador": 11}   # linhas de Player_Actions.png (2 quadros de 48 px)
+const ANIM_SEGUNDOS := 0.36
 var _msg := ""
 var _msg_t := 0.0
 const COR_FERR := {"enxada": Color(0.6, 0.4, 0.2), "regador": Color(0.3, 0.6, 1.0), "picareta": Color(0.8, 0.8, 0.85), "semente": Color(0.4, 0.9, 0.4), "mao": Color(1.0, 0.9, 0.3)}
@@ -52,7 +58,13 @@ func _aplica(l: Vector2i) -> void:
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
+	_relogio += delta
+	_heroi_t = maxf(_heroi_t - delta, 0.0)
 	for a in estado.fazenda.acoes_recentes:
+		_heroi_y = a["y"] + 0.5
+		if ANIM_LINHA.has(a["ferr"]):
+			_heroi_ferr = a["ferr"]
+			_heroi_t = ANIM_SEGUNDOS
 		_flashes.append({"x": a["x"], "y": a["y"], "cor": COR_FERR.get(a["ferr"], Color.WHITE), "t": Cfg.FLASH_SEGUNDOS})
 	estado.fazenda.acoes_recentes.clear()
 	for f in _flashes:
@@ -128,6 +140,7 @@ func _draw() -> void:
 			raio = estado.fazenda.ferramentas[nome] - 1
 		var ra := Rect2(o + Vector2(_hover.x - raio, _hover.y - raio) * t, Vector2(t, t) * (2 * raio + 1))
 		draw_rect(ra, Color(1, 1, 1, 0.9), false, 2.0)
+	_desenha_heroi(o, t)
 	# brilho curto das acoes (arar, regar, plantar, colher)
 	for f in _flashes:
 		var c: Color = f["cor"]
@@ -135,3 +148,19 @@ func _draw() -> void:
 		draw_rect(Rect2(o + Vector2(f["x"], f["y"]) * t, Vector2(t, t)), c)
 	if _msg_t > 0.0:
 		draw_string(fonte, Vector2(o.x + 8, size.y - 8), _msg, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 0.95, 0.6))
+
+# Heroi ao lado do terreno: parado (idle) ou usando a ferramenta (picareta, enxada, regador)
+func _desenha_heroi(o: Vector2, t: float) -> void:
+	var parado := Arte.tex("Player/Player.png")
+	var acoes := Arte.tex("Player/Player_Actions.png")
+	if parado == null or acoes == null:
+		return
+	var lado := t * 3.0
+	var pos := Vector2(o.x - lado * 0.75, o.y + _heroi_y * t - lado * 0.78)
+	if _heroi_t > 0.0 and ANIM_LINHA.has(_heroi_ferr):
+		var q := 0 if _heroi_t > ANIM_SEGUNDOS * 0.5 else 1
+		var r := Rect2(pos - Vector2(lado * 0.25, lado * 0.25), Vector2(lado * 1.5, lado * 1.5))
+		draw_texture_rect_region(acoes, r, Rect2(q * 48, ANIM_LINHA[_heroi_ferr] * 48, 48, 48))
+	else:
+		var f := int(_relogio * 8.0) % 6
+		draw_texture_rect_region(parado, Rect2(pos, Vector2(lado, lado)), Rect2(f * 32, 32, 32, 32))

@@ -117,6 +117,10 @@ func _captura(caminho: String) -> void:
 			abas.current_tab = int(arg.substr(6))
 	Engine.time_scale = 6.0
 	await get_tree().create_timer(12.0).timeout
+	if "--demo-fazenda" in OS.get_cmdline_user_args():
+		Engine.time_scale = 1.0
+		estado.fazenda.usa_ferramenta("enxada", 2, 3)
+		await get_tree().create_timer(0.1).timeout
 	var img := get_viewport().get_texture().get_image()
 	img.save_png(caminho)
 	get_tree().quit()
