@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[teste] min 1: fase 4 (4/10) nivel 7, ouro 16, CP 238, derrotas 0, cultivo 6, minerio 19, atr [2, 3, 0, 1, 0, 0, 0], equip ["Espada Épico", "Armadura Épico", "-"]
+[teste] min 2: fase 7 (7/10) nivel 10, ouro 17, CP 402, derrotas 0, cultivo 7, minerio 19, atr [4, 4, 2, 3, 1, 1, 1], equip ["Espada Épico", "Armadura Épico", "-"]
+[teste] min 3: fase 10 (8/10) nivel 11, ouro 27, CP 547, derrotas 0, cultivo 8, minerio 18, atr [5, 6, 3, 4, 2, 2, 1], equip ["Espada Épico +1", "Armadura Comum", "Amuleto Raro"]
+[teste] min 4: fase 12 (5/10) nivel 13, ouro 37, CP 1063, derrotas 0, cultivo 8, minerio 18, atr [7, 7, 4, 5, 3, 3, 3], equip ["Espada Lendário", "Armadura de Aço Épico", "Amuleto Raro"]
+[teste] min 5: fase 15 (0/10) nivel 14, ouro 24, CP 1545, derrotas 0, cultivo 9, minerio 16, atr [8, 9, 5, 7, 4, 4, 4], equip ["Espada de Aço Raro +1", "Armadura de Aço Épico +1", "Amuleto de Prata Épico"]
+[teste] min 6: fase 16 (5/10) nivel 16, ouro 9, CP 1982, derrotas 0, cultivo 9, minerio 12, atr [9, 10, 6, 8, 5, 5, 4], equip ["Espada de Aço Raro +2", "Armadura de Aço Épico +1", "Amuleto de Prata Épico +1"]
+[teste] min 7: fase 18 (4/10) nivel 16, ouro 13, CP 2224, derrotas 0, cultivo 10, minerio 2, atr [10, 11, 6, 8, 6, 6, 5], equip ["Espada de Aço Raro +3", "Armadura de Aço Épico +3", "Amuleto de Prata Épico +2"]
+[teste] min 8: fase 20 (2/10) nivel 17, ouro 167, CP 2841, derrotas 0, cultivo 10, minerio 0, atr [11, 12, 7, 9, 7, 7, 6], equip ["Espada de Aço Comum +1", "Armadura de Aço Épico +3", "Amuleto de Prata Comum +1"]
+[teste] min 9: fase 20 (10/10) CHEFE nivel 17, ouro 25, CP 2871, derrotas 0, cultivo 10, minerio 0, atr [12, 12, 8, 10, 7, 7, 6], equip ["Espada de Aço Comum +1", "Armadura de Aço Épico +3", "Amuleto de Prata Comum +1"]
+[teste] min 10: fase 20 (0/10) nivel 18, ouro 236, CP 3635, derrotas 0, cultivo 10, minerio 0, atr [12, 13, 8, 10, 8, 7, 7], equip ["Arco Longo Raro", "Armadura de Aço Épico +3", "Amuleto de Prata Comum +1"]
+[teste] VITORIA FINAL

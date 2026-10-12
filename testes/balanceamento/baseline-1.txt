@@ -1,0 +1,21 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[teste] min 1: fase 3 (3/10) nivel 6, ouro 8, CP 188, derrotas 0, cultivo 5, minerio 17, atr [1, 2, 0, 0, 0, 0, 0], equip ["Espada Comum", "-", "Amuleto Raro"]
+[teste] min 2: fase 6 (2/10) nivel 9, ouro 11, CP 304, derrotas 0, cultivo 7, minerio 20, atr [3, 4, 1, 2, 1, 1, 0], equip ["Arco Comum", "Armadura Comum", "Amuleto Raro"]
+[teste] min 3: fase 9 (1/10) nivel 10, ouro 23, CP 391, derrotas 0, cultivo 8, minerio 20, atr [4, 5, 2, 3, 2, 1, 1], equip ["Arco Comum", "Armadura Épico", "Amuleto Comum"]
+[teste] min 4: fase 10 (10/10) CHEFE nivel 11, ouro 25, CP 679, derrotas 0, cultivo 8, minerio 19, atr [5, 6, 3, 4, 2, 2, 2], equip ["Cajado Épico", "Armadura Épico", "Amuleto Comum"]
+[teste] min 5: fase 12 (6/10) nivel 13, ouro 29, CP 883, derrotas 0, cultivo 9, minerio 19, atr [7, 7, 4, 5, 3, 3, 3], equip ["Cajado Épico", "Armadura de Aço Raro", "Amuleto Raro"]
+[teste] min 6: fase 14 (4/10) nivel 14, ouro 32, CP 1085, derrotas 0, cultivo 9, minerio 17, atr [8, 9, 5, 6, 4, 4, 3], equip ["Cajado de Carvalho Comum +1", "Armadura de Aço Raro +1", "Amuleto de Prata Comum"]
+[teste] min 7: fase 15 (10/10) CHEFE nivel 15, ouro 2, CP 1579, derrotas 0, cultivo 10, minerio 9, atr [9, 9, 5, 7, 5, 5, 4], equip ["Espada de Aço Raro +2", "Armadura de Aço Raro +2", "Amuleto de Prata Comum +1"]
+[teste] min 8: fase 17 (8/10) nivel 16, ouro 23, CP 2382, derrotas 0, cultivo 10, minerio 0, atr [10, 10, 6, 8, 6, 6, 5], equip ["Espada de Aço Raro +4", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 9: fase 19 (8/10) nivel 17, ouro 106, CP 2532, derrotas 0, cultivo 10, minerio 0, atr [11, 12, 7, 9, 7, 7, 6], equip ["Espada de Aço Raro +4", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 10: fase 20 (10/10) CHEFE nivel 17, ouro 170, CP 2872, derrotas 0, cultivo 10, minerio 0, atr [12, 13, 8, 10, 7, 7, 6], equip ["Arco Longo Comum", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 11: fase 20 (5/10) nivel 18, ouro 146, CP 3628, derrotas 1, cultivo 10, minerio 0, atr [12, 13, 8, 10, 7, 7, 6], equip ["Cajado de Carvalho Raro", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 12: fase 20 (10/10) CHEFE nivel 18, ouro 199, CP 3760, derrotas 1, cultivo 11, minerio 0, atr [12, 13, 8, 10, 8, 7, 7], equip ["Cajado de Carvalho Raro", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 13: fase 20 (10/10) CHEFE nivel 18, ouro 20, CP 3812, derrotas 2, cultivo 11, minerio 0, atr [13, 13, 8, 11, 8, 8, 7], equip ["Cajado de Carvalho Raro", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 14: fase 20 (9/10) nivel 18, ouro 175, CP 3815, derrotas 3, cultivo 11, minerio 0, atr [13, 14, 8, 11, 8, 8, 7], equip ["Cajado de Carvalho Raro", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 15: fase 20 (0/10) nivel 18, ouro 426, CP 3815, derrotas 4, cultivo 11, minerio 0, atr [13, 14, 8, 11, 8, 8, 7], equip ["Cajado de Carvalho Raro", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 16: fase 20 (10/10) CHEFE nivel 19, ouro 260, CP 3861, derrotas 4, cultivo 11, minerio 0, atr [14, 14, 9, 11, 8, 8, 7], equip ["Cajado de Carvalho Raro", "Armadura de Aço Raro +1", "Amuleto de Prata Épico +1"]
+[teste] min 17: fase 20 (10/10) CHEFE nivel 19, ouro 441, CP 3917, derrotas 5, cultivo 11, minerio 0, atr [14, 14, 9, 12, 9, 8, 7], equip ["Cajado de Carvalho Raro", "Armadura de Aço Comum", "Amuleto de Prata Épico +1"]
+[teste] min 18: fase 20 (0/10) nivel 19, ouro 211, CP 6215, derrotas 5, cultivo 11, minerio 0, atr [14, 15, 9, 12, 9, 9, 8], equip ["Cajado de Carvalho Raro", "Armadura de Aço Comum", "Amuleto de Prata Lendário"]
+[teste] VITORIA FINAL
