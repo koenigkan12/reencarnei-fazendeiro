@@ -83,6 +83,7 @@ func _troca_tela(nova: Control) -> void:
 		_tela.queue_free()
 	_tela = nova
 	if nova != null:
+		nova.set_anchors_preset(Control.PRESET_FULL_RECT)   # sem isso a tela fica com tamanho 0 dentro do CanvasLayer
 		add_child(nova)
 
 func _mostra_menu() -> void:

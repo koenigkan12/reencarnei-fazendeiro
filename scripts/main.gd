@@ -68,6 +68,8 @@ func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--captura="):
 			_captura(arg.substr(10))
+		if arg.begins_with("--tela="):   # captura SEM pular os menus (ver menu principal etc.)
+			_captura(arg.substr(7))
 
 # A tela de cima acompanha a aba: Fazenda mostra a fazenda; as outras mostram a batalha.
 # Na fazenda, o botao "Ver batalha" alterna. A batalha continua rodando escondida.
