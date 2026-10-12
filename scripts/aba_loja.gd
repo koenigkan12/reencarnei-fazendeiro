@@ -85,8 +85,13 @@ func _atualiza() -> void:
 			l["botao"].text = "MÁXIMO"
 			l["botao"].disabled = true
 		else:
-			l["botao"].text = "Melhorar: %d" % c
-			l["botao"].disabled = estado.ouro < c
+			var cm: int = estado.loja.cultivo_min_ferramenta(f["id"])
+			if estado.fazenda.cultivo_nivel < cm:
+				l["botao"].text = "Cultivo Nv %d" % cm
+				l["botao"].disabled = true
+			else:
+				l["botao"].text = "Melhorar: %d" % c
+				l["botao"].disabled = estado.ouro < c
 	_irr["rotulo"].text = "Irrigação  nível %d  (+%d%% crescimento%s)" % [estado.fazenda.irrigacao, roundi(estado.fazenda.irrigacao * Cfg.IRRIGACAO_VEL_POR_NIVEL * 100.0), ", planta já nasce regada" if estado.fazenda.autorega() else "; nível %d: nasce regada" % Cfg.IRRIGACAO_AUTOREGA_NIVEL]
 	var ci: int = estado.loja.custo_irrigacao()
 	if ci < 0:

@@ -23,9 +23,15 @@ func custo_ferramenta(id: String) -> int:
 			return floori(f["custos"][nv - 1])
 	return -1    # no maximo
 
+# Nivel de Cultivo exigido para a proxima melhoria (0 se no maximo)
+func cultivo_min_ferramenta(id: String) -> int:
+	var lista: Array = Cfg.FERRAMENTA_CULTIVO_MIN.get(id, [])
+	var i: int = e.fazenda.ferramentas[id] - 1
+	return lista[i] if i < lista.size() else 0
+
 func melhora_ferramenta(id: String) -> bool:
 	var c := custo_ferramenta(id)
-	if c < 0 or e.ouro < c:
+	if c < 0 or e.ouro < c or e.fazenda.cultivo_nivel < cultivo_min_ferramenta(id):
 		return false
 	e.ouro -= c
 	e.fazenda.ferramentas[id] += 1

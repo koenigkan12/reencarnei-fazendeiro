@@ -24,6 +24,7 @@ var semente_selecionada := 0
 var ferramentas := {"enxada": 1, "regador": 1, "picareta": 1}
 var irrigacao := 0
 var _timer_rocha := 0.0
+var acoes_recentes: Array = []   # [{x, y, ferr}] acoes que mudaram um lote; a tela le e limpa (efeito visual)
 
 func colunas_abertas() -> int:
 	return mini(Cfg.COLUNAS, Cfg.COLUNAS_INICIAIS + cultivo_nivel - 1)
@@ -84,10 +85,13 @@ func usa_ferramenta(nome: String, x: int, y: int) -> void:
 	if ferramentas.has(nome):
 		raio = ferramentas[nome] - 1
 	var mudou_algo := false
+	if acoes_recentes.size() > 200:
+		acoes_recentes.clear()    # ninguem esta lendo (tela fechada)
 	for dy in range(-raio, raio + 1):
 		for dx in range(-raio, raio + 1):
 			if _aplica(nome, x + dx, y + dy):
 				mudou_algo = true
+				acoes_recentes.append({"x": x + dx, "y": y + dy, "ferr": nome})
 	if mudou_algo:
 		e.notifica()
 
@@ -166,8 +170,11 @@ func vende_colheita(cultura: int) -> void:
 
 
 # Chamado todo quadro (a fazenda cresce mesmo com outra aba aberta)
+func velocidade() -> float:
+	return 1.0 + cultivo_nivel * Cfg.CULTIVO_CRESCIMENTO_POR_NIVEL + irrigacao * Cfg.IRRIGACAO_VEL_POR_NIVEL + e.personagem.talento("crescimento_pct")
+
 func tick(delta: float) -> void:
-	var vel: float = 1.0 + cultivo_nivel * Cfg.CULTIVO_CRESCIMENTO_POR_NIVEL + irrigacao * Cfg.IRRIGACAO_VEL_POR_NIVEL + e.personagem.talento("crescimento_pct")
+	var vel: float = velocidade()
 	for y in Cfg.LINHAS:
 		for x in colunas_abertas():
 			var l := lote(x, y)
