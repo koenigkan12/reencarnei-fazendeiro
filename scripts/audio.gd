@@ -67,7 +67,11 @@ func musica(nome: String) -> void:
 	if s == null:
 		_musica.stop()
 		return
-	if "loop" in s:
+	if s is AudioStreamWAV:
+		s.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		s.loop_begin = 0
+		s.loop_end = s.data.size() / 2   # 16 bits, mono
+	elif "loop" in s:
 		s.set("loop", true)
 	_musica.stream = s
 	_musica.play()

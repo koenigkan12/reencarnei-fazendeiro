@@ -4,6 +4,7 @@ extends RefCounted
 # (piscar, tremer, projeteis, particulas, numeros e o nome da habilidade escrito na tela).
 # Quem tem as habilidades equipadas e os talentos e o personagem.gd; aqui so ha o que acontece na luta.
 const Cfg := preload("res://scripts/cfg.gd")
+const Audio := preload("res://scripts/audio.gd")
 
 var b                          # batalha.gd (a cena onde os efeitos aparecem)
 var e                          # Estado
@@ -56,6 +57,7 @@ func tick(delta: float) -> void:
 
 func _usa(h: Dictionary) -> void:
 	var f: float = e.personagem.fator_habilidade(h["id"])
+	Audio.toca_efeito("skill")
 	_nome(h)
 	match h["tipo"]:
 		"dano":

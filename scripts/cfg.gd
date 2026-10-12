@@ -219,10 +219,10 @@ const VERSAO_JOGO := "v1 (build de teste)"
 const RESOLUCOES := [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080)]
 const AUTOSAVE_SEGUNDOS := 60.0       # o fluxo chama estado.salva() de tempos em tempos, se o save existir
 # Audio: o PC coloca os arquivos em AUDIO_PASTA com estes nomes (.ogg, .mp3 ou .wav). Sem arquivo = silencio.
-const AUDIO_PASTA := "res://assets/audio"
+const AUDIO_PASTA := "res://audio"      # sons proprios gerados por tools/gera_audio.py (fora de assets/, vao no git)
 const AUDIO_NOMES := {
-	"musica": ["menu", "jogo", "fim"],
-	"efeitos": ["clique", "tutorial_passo", "vitoria"],
+	"musica": ["menu", "jogo", "fazenda", "fim"],
+	"efeitos": ["clique", "tutorial_passo", "vitoria", "golpe", "critico", "dano_heroi", "skill", "morte_inimigo", "level_up", "drop", "compra", "arar", "regar", "colher", "derrota", "aviso_chefe"],
 }
 # Tutorial de primeira vez. "aba" = aba que o tutorial abre naquele passo ("" = nenhuma).
 const TUTORIAL := [

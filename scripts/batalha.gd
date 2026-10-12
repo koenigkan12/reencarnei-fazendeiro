@@ -3,6 +3,7 @@ extends Control
 # Ouro, XP, nivel, upgrades e equipamento vivem no Estado (compartilhado com as abas).
 
 const Cfg := preload("res://scripts/cfg.gd")
+const Audio := preload("res://scripts/audio.gd")
 const Unidade := preload("res://scripts/unidade.gd")
 const Skills := preload("res://scripts/skills.gd")
 const Arte := preload("res://scripts/arte.gd")
@@ -194,6 +195,7 @@ func _inicia_chefe() -> void:
 	tempo_chefe = Cfg.CHEFES[chefe_tipo]["tempo"]
 	_novo_inimigo()
 	_barra_chefe.visible = true
+	Audio.toca_efeito("aviso_chefe")
 	_aviso.text = "⚠ WARNING ⚠\n%s!" % Cfg.CHEFES[chefe_tipo]["nome"]
 	_aviso.size.y = 110
 	var t := create_tween()
@@ -248,11 +250,13 @@ func _ataca(atacante: Control, alvo: Control, direcao: float) -> void:
 		if crit:
 			dano *= estado.personagem.crit_mult()
 		alvo.recebe_dano(dano)
+		Audio.toca_efeito("critico" if crit else "golpe")
 		_numero_de_dano(alvo, dano, false, crit)
 	else:
 		var dano2: float = atacante.dano * estado.personagem.reducao_dano()
 		dano2 *= skills.escudo_mult()
 		alvo.recebe_dano(dano2)
+		Audio.toca_efeito("dano_heroi")
 		_numero_de_dano(alvo, dano2, true, false)
 
 
@@ -275,11 +279,13 @@ func _numero_de_dano(alvo: Control, valor: float, no_heroi: bool, crit: bool, co
 	t.chain().tween_callback(l.queue_free)
 func _inimigo_morreu() -> void:
 	inimigo.morte()
+	Audio.toca_efeito("morte_inimigo")
 	respawn = Cfg.RESPAWN_SEGUNDOS
 	var era_chefe := contra_chefe
 	var subiu: bool = estado.ganha(inimigo.get_meta("ouro"), inimigo.get_meta("xp"))
 	if subiu:
 		heroi.vida = heroi.vida_max
+		Audio.toca_efeito("level_up")
 	estado.equipamento.tenta_drop(fase, era_chefe)
 	estado.fazenda.tenta_semente(era_chefe)
 	if era_chefe:
@@ -319,6 +325,7 @@ func continua_apos_vitoria() -> void:
 	_atualiza_hud()
 
 func _derrota(motivo: String) -> void:
+	Audio.toca_efeito("derrota")
 	derrotas += 1
 	descanso = Cfg.DESCANSO_SEGUNDOS
 	contra_chefe = false
@@ -352,6 +359,7 @@ func _sincroniza() -> void:
 	_atualiza_hud()
 
 func _mostra_drop(info: Dictionary) -> void:
+	Audio.toca_efeito("drop")
 	var it: Dictionary = info["item"]
 	var r: Dictionary = Cfg.RARIDADES[it["raridade"]]
 	_msg_drop.text = "Drop: %s (%s) - %s" % [estado.equipamento.nome_item(it), estado.equipamento.descricao_item(it), info["acao"]]

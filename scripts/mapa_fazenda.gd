@@ -2,6 +2,7 @@ extends Control
 # Mapa da fazenda: grade de lotes desenhada por codigo, com a arte do pack quando existe (senao, formas simples).
 # Clique (ou arraste) aplica a ferramenta selecionada.
 const Cfg := preload("res://scripts/cfg.gd")
+const Audio := preload("res://scripts/audio.gd")
 const Arte := preload("res://scripts/arte.gd")
 
 var estado
@@ -62,6 +63,7 @@ func _process(delta: float) -> void:
 	_heroi_t = maxf(_heroi_t - delta, 0.0)
 	for a in estado.fazenda.acoes_recentes:
 		_heroi_y = a["y"] + 0.5
+		Audio.toca_efeito({"enxada": "arar", "picareta": "arar", "regador": "regar", "mao": "colher"}.get(a["ferr"], "clique"))
 		if ANIM_LINHA.has(a["ferr"]):
 			_heroi_ferr = a["ferr"]
 			_heroi_t = ANIM_SEGUNDOS

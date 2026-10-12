@@ -1,6 +1,7 @@
 extends RefCounted
 # Sistema LOJA: compra de sementes e melhorias de ferramentas e irrigacao (ouro). Altera o estado da fazenda.
 const Cfg := preload("res://scripts/cfg.gd")
+const Audio := preload("res://scripts/audio.gd")
 
 var e                         # Estado (raiz)
 
@@ -14,6 +15,7 @@ func compra_semente(cultura: int, qtd: int) -> bool:
 	e.ouro -= custo
 	e.fazenda.sementes[cultura] += qtd
 	e.notifica()
+	Audio.toca_efeito("compra")
 	return true
 
 func custo_ferramenta(id: String) -> int:
@@ -36,6 +38,7 @@ func melhora_ferramenta(id: String) -> bool:
 	e.ouro -= c
 	e.fazenda.ferramentas[id] += 1
 	e.notifica()
+	Audio.toca_efeito("compra")
 	return true
 
 func custo_irrigacao() -> int:
@@ -48,6 +51,7 @@ func melhora_irrigacao() -> bool:
 	e.ouro -= c
 	e.fazenda.irrigacao += 1
 	e.notifica()
+	Audio.toca_efeito("compra")
 	return true
 
 # Valor total da colheita em estoque e venda de tudo de uma vez (aba Loja)

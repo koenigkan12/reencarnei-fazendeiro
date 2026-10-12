@@ -5,6 +5,7 @@ extends Control
 const ABAS := ["Personagem", "Equipamento", "Fazenda", "Loja"]
 const ALTURA_PAINEL := 350
 const Cfg := preload("res://scripts/cfg.gd")
+const Audio := preload("res://scripts/audio.gd")
 const Batalha := preload("res://scripts/batalha.gd")
 const Estado := preload("res://scripts/estado.gd")
 const AbaPersonagem := preload("res://scripts/aba_personagem.gd")
@@ -85,6 +86,7 @@ func _atualiza_topo() -> void:
 	fazenda.visible = mostra_fazenda
 	batalha.visible = not mostra_fazenda
 	_voltar.visible = na_fazenda and _vendo_batalha
+	Audio.toca_musica("fazenda" if mostra_fazenda else "jogo")
 
 func _exit_tree() -> void:
 	estado.libera()
