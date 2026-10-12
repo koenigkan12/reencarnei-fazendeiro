@@ -159,6 +159,13 @@ const CP_VIDA_DIV := 10.0
 const CP_DANO_MULT := 5.0
 const CP_DEFESA_MULT := 2.0
 
+# ================= SALVAMENTO E GANHO OFFLINE (salvamento.gd) =================
+const SAVE_ARQUIVO := "user://save.json"   # a copia anterior fica em save.json.bak
+const SAVE_VERSAO := 1
+const OFFLINE_HORAS_MAX := 8.0             # limite de horas contadas no ganho offline
+const OFFLINE_EFICIENCIA := 0.5            # fracao da taxa de ouro/XP de combate ganha offline
+const OFFLINE_MIN_SEGUNDOS := 60.0         # ausencias menores que isto nao mostram resumo
+
 # ================= FAZENDA =================
 const CULTURAS := [
 	{"nome": "Trigo", "cor": Color(0.9, 0.8, 0.3), "tempo": 20.0, "preco": 2.0, "xp": 1.0, "nivel": 1, "peso": 60.0, "semente": 3.0},
