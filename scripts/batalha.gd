@@ -29,6 +29,7 @@ var _rotulo_fase: Label
 var _barra_chefe: ProgressBar
 var _aviso: Label
 var _msg_drop: Label
+var _hud_comida: Label
 var _painel_derrota: PanelContainer
 var _texto_derrota: Label
 
@@ -90,6 +91,8 @@ func _cria_hud() -> void:
 	_aviso.add_theme_constant_override("outline_size", 8)
 	_aviso.modulate.a = 0.0
 	add_child(_aviso)
+	_hud_comida = Label.new()
+	add_child(_hud_comida)
 	_msg_drop = Label.new()
 	_msg_drop.add_theme_font_size_override("font_size", 18)
 	_msg_drop.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -133,6 +136,7 @@ func _posiciona() -> void:
 	_aviso.position = Vector2(0, size.y * 0.25)
 	_aviso.size = Vector2(size.x, 60)
 	_msg_drop.position = Vector2(16, 70)
+	_hud_comida.position = Vector2(16, size.y - 34)
 	_painel_derrota.position = Vector2(size.x / 2.0 - 190, size.y * 0.3)
 	_painel_derrota.size = Vector2(380, 150)
 
@@ -148,18 +152,22 @@ func _novo_inimigo() -> void:
 	var e := fase - 1
 	if contra_chefe:
 		var c: Dictionary = Cfg.CHEFES[chefe_tipo]
-		var base: Dictionary = Cfg.INIMIGOS[2]
+		var base: Dictionary = _lista_inimigos()[2]
 		inimigo.configura(c["nome"], c["cor"], c["tamanho"],
 			base["vida"] * c["vida_mult"] * pow(Cfg.ESCALA_VIDA, e), base["dano"] * c["dano_mult"] * pow(Cfg.ESCALA_DANO, e), base["intervalo"])
 		inimigo.set_meta("ouro", base["ouro"] * c["ouro_mult"] * pow(Cfg.ESCALA_OURO, e))
 		inimigo.set_meta("xp", base["xp"] * c["xp_mult"] * pow(Cfg.ESCALA_XP, e))
 	else:
-		var base2: Dictionary = Cfg.INIMIGOS[randi() % Cfg.INIMIGOS.size()]
+		var lista := _lista_inimigos()
+		var base2: Dictionary = lista[randi() % lista.size()]
 		inimigo.configura(base2["nome"], base2["cor"], base2["tamanho"],
 			base2["vida"] * pow(Cfg.ESCALA_VIDA, e), base2["dano"] * pow(Cfg.ESCALA_DANO, e), base2["intervalo"])
 		inimigo.set_meta("ouro", base2["ouro"] * pow(Cfg.ESCALA_OURO, e))
 		inimigo.set_meta("xp", base2["xp"] * pow(Cfg.ESCALA_XP, e))
 	inimigo.visible = true
+
+func _lista_inimigos() -> Array:
+	return Cfg.INIMIGOS_ZONA2 if fase >= Cfg.ZONA2_A_PARTIR_DA_FASE else Cfg.INIMIGOS
 
 func _inicia_chefe() -> void:
 	contra_chefe = true
@@ -176,6 +184,7 @@ func _inicia_chefe() -> void:
 
 # ---------- loop ----------
 func _process(delta: float) -> void:
+	_atualiza_comida()
 	if descanso > 0.0:
 		descanso -= delta
 		_texto_derrota.text = "Derrotado! O herói descansa... %d s" % ceili(maxf(descanso, 0.0))
@@ -238,6 +247,7 @@ func _inimigo_morreu() -> void:
 	if subiu:
 		heroi.vida = heroi.vida_max
 	estado.tenta_drop(fase, era_chefe)
+	estado.tenta_semente(era_chefe)
 	if era_chefe:
 		contra_chefe = false
 		_barra_chefe.visible = false
@@ -256,6 +266,7 @@ func _avanca_fase() -> void:
 	abates = 0
 	if fase < Cfg.FASES_TOTAL:
 		fase += 1
+		_fundo.color = Color(0.22, 0.16, 0.28) if fase >= Cfg.ZONA2_A_PARTIR_DA_FASE else Color(0.16, 0.22, 0.28)
 	else:
 		vitoria_final = true
 		_painel_derrota.visible = true
@@ -314,3 +325,14 @@ func _atualiza_hud() -> void:
 	_rotulo_fase.text = rot
 	_barra_fase.max_value = Cfg.INIMIGOS_POR_FASE
 	_barra_fase.value = abates
+
+func _atualiza_comida() -> void:
+	var partes: Array = []
+	for sl in estado.slots_comida:
+		if sl["prato"] == -1:
+			partes.append("[vazio]")
+		elif sl["restante"] > 0.0:
+			partes.append("[%s %d s]" % [Cfg.PRATOS[sl["prato"]]["nome"], ceili(sl["restante"])])
+		else:
+			partes.append("[%s: sem estoque]" % Cfg.PRATOS[sl["prato"]]["nome"])
+	_hud_comida.text = "Comida: " + "  ".join(partes)

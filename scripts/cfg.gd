@@ -66,3 +66,38 @@ const VENDA_BASE := 5.0              # ouro ao vender = base * mult da raridade 
 # CP (poder de combate) = vida/CP_VIDA_DIV + dano*CP_DANO_MULT/intervalo
 const CP_VIDA_DIV := 10.0
 const CP_DANO_MULT := 5.0
+# ---------- Fazenda ----------
+const CULTURAS := [
+	{"nome": "Trigo", "cor": Color(0.9, 0.8, 0.3), "tempo": 15.0, "preco": 2.0, "xp": 1.0, "nivel": 1, "peso": 60.0},
+	{"nome": "Cenoura", "cor": Color(0.95, 0.55, 0.15), "tempo": 30.0, "preco": 6.0, "xp": 3.0, "nivel": 2, "peso": 30.0},
+	{"nome": "Abóbora", "cor": Color(0.95, 0.4, 0.1), "tempo": 60.0, "preco": 15.0, "xp": 8.0, "nivel": 4, "peso": 10.0},
+]
+const LOTES_TOTAL := 8
+const LOTES_BASE := 2                 # lotes abertos no Cultivo nivel 1; +1 a cada LOTES_A_CADA niveis
+const LOTES_A_CADA := 2
+const RENDIMENTO := 2                 # unidades colhidas por lote
+const SEMENTE_CHANCE := 0.2           # por inimigo comum derrotado
+const SEMENTES_CHEFE := 3
+# Cultivo (a habilidade "inutil" do heroi): sobe colhendo. XP p/ subir = BASE * CRESC^(nivel-1)
+const CULTIVO_XP_BASE := 5.0
+const CULTIVO_XP_CRESC := 1.6
+const AUTOPLANTIO_NIVEL := 4          # a partir daqui o lote replanta sozinho se houver semente
+# ---------- Comida (cada cultura vira um prato) ----------
+# efeito: "regen" soma % de vida/s, "vida" multiplica a vida maxima, "dano" multiplica o dano
+const COZINHA_CUSTO := 4              # unidades da cultura gastas por prato
+const SLOTS_COMIDA := 3
+const PRATOS := [
+	{"nome": "Pão", "efeito": "regen", "valor": 0.02, "duracao": 60.0, "desc": "+2% vida/s"},
+	{"nome": "Ensopado", "efeito": "vida", "valor": 0.30, "duracao": 90.0, "desc": "+30% vida"},
+	{"nome": "Torta", "efeito": "dano", "valor": 0.40, "duracao": 90.0, "desc": "+40% dano"},
+]
+
+# ---------- Zona 2 (fases 11 a 20) ----------
+const ZONA2_A_PARTIR_DA_FASE := 11
+const INIMIGOS_ZONA2 := [
+	{"nome": "Lobo", "cor": Color(0.6, 0.6, 0.65), "tamanho": Vector2(70, 50), "vida": 35.0, "dano": 6.0, "intervalo": 0.9, "ouro": 4.0, "xp": 5.0},
+	{"nome": "Esqueleto", "cor": Color(0.9, 0.9, 0.8), "tamanho": Vector2(44, 90), "vida": 50.0, "dano": 8.0, "intervalo": 1.1, "ouro": 6.0, "xp": 7.0},
+	{"nome": "Ogro", "cor": Color(0.5, 0.4, 0.2), "tamanho": Vector2(85, 115), "vida": 80.0, "dano": 11.0, "intervalo": 1.7, "ouro": 9.0, "xp": 10.0},
+]
+const NOMES_ITEM_ZONA2 := ["Espada de Aço", "Armadura de Aço", "Amuleto de Prata"]
+const ITEM_ZONA2_MULT := 1.5          # itens da zona 2 sao mais fortes
